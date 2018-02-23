@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { WelcomePage } from '../welcome/welcome';
 import { SynesthesiavisionPage } from '../synesthesiavision/synesthesiavision';
@@ -22,10 +22,13 @@ export class BluetoothConnectionVerifyPage {
 	unpairedDevices: any;
     pairedDevices: any;
     gettingDevices: Boolean;
+    loading: any;
 
-	  constructor(private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
-		public navParams: NavParams, public alertCtrl: AlertController) {
-		
+	constructor(
+        private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
+        public navParams: NavParams, public alertCtrl: AlertController, 
+        public loadingCtrl: LoadingController) {
+        
 		bluetoothSerial.enable();
 	}
 
@@ -40,7 +43,11 @@ export class BluetoothConnectionVerifyPage {
         this.unpairedDevices = null;
         this.gettingDevices = true;
 
-        this.navCtrl.push(SynesthesiavisionPage);
+        //this.navCtrl.push(SynesthesiavisionPage);
+        
+        //Exibe o loading spinner
+        this.createLoading();
+
 
         this.bluetoothSerial.discoverUnpaired().then((success) => {
             this.unpairedDevices = success;
@@ -49,9 +56,18 @@ export class BluetoothConnectionVerifyPage {
             success.forEach(element => {
                 // alert(element.name);
             });
+
+            //Deixa de exibir o loading spinner
+            this.loading.dismiss();
         },
         (err) => {
-            console.log(err);
+            console.log('Deu ERRO: ' + err);
+
+            //Deixa de exibir o loading spinner
+            this.loading.dismiss();
+
+            //Caso ocorra algum erro, exibe qual foi o erro
+            this.showAlert(err);
         })
 
         this.bluetoothSerial.list().then((success) => {
@@ -127,5 +143,26 @@ export class BluetoothConnectionVerifyPage {
 	
 	welcome(){
 		this.navCtrl.push(WelcomePage);
-	}
+    }
+
+    showAlert(erro: string) {
+        
+        let alert = this.alertCtrl.create({
+            title: 'Error',
+            message: erro,
+            buttons: ['OK']
+        });
+
+        alert.present();
+    }
+
+    createLoading(){
+        
+        let loading = this.loadingCtrl.create({
+            content: 'Searching devices, please wait...',
+            dismissOnPageChange: true
+        });
+
+        this.loading = loading;
+    }
 }

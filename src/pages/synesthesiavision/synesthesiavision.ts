@@ -34,4 +34,8 @@ export class SynesthesiavisionPage {
     console.log('ionViewDidLoad SynesthesiavisionPage');
   }
 
+  checkWeather(){
+    console.log("Weather Checked");
+  }
+
 }
