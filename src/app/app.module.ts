@@ -2,67 +2,64 @@ import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
+import { SplashScreen } from '@ionic-native/splash-screen';
+import { StatusBar } from '@ionic-native/status-bar';
+import { HttpClientModule } from '@angular/common/http';
 
-import { AboutPage } from '../pages/about/about';
-import { ContactPage } from '../pages/contact/contact';
-import { HomePage } from '../pages/home/home';
-import { TabsPage } from '../pages/tabs/tabs';
-
-// Adicionando as novas páginas criadas
-import { WelcomePage } from '../pages/welcome/welcome';
-import { LoginPage } from '../pages/login/login';
-import { SignupPage } from '../pages/signup/signup';
+// Pages imports 
 import { SynesthesiavisionPage } from '../pages/synesthesiavision/synesthesiavision';
 import { BluetoothConnectionVerifyPage } from "../pages/bluetooth-connection-verify/bluetooth-connection-verify";
 
-
-// Adicionando os providers 
+// Plugins imports
+import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { MobileAccessibility } from "@ionic-native/mobile-accessibility";
-import {BluetoothSerial} from '@ionic-native/bluetooth-serial';
+import { NativeStorage } from "@ionic-native/native-storage";
+import { TextToSpeech } from "@ionic-native/text-to-speech";
+import { Geolocation } from "@ionic-native/geolocation";
+import { AndroidPermissions } from "@ionic-native/android-permissions";
 
-
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
+// Services imports
+import { AudioProvider } from '../providers/audio/audio';
+import { BluetoothProvider } from '../providers/bluetooth/bluetooth';
+import { WeatherForecastProvider } from '../providers/weather-forecast/weather-forecast';
+import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech';
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
-  declarations: [
-    MyApp,
-    AboutPage,
-    ContactPage,
-    HomePage,
-    TabsPage,
+	declarations: [
+		MyApp,
 
-    WelcomePage,
-    LoginPage,
-    SignupPage,
-    SynesthesiavisionPage,
-    BluetoothConnectionVerifyPage
-  ],
-  imports: [
-    BrowserModule,
-    IonicModule.forRoot(MyApp)
-  ],
-  bootstrap: [IonicApp],
-  entryComponents: [
-    MyApp,
-    AboutPage,
-    ContactPage,
-    HomePage,
-    TabsPage,
+		SynesthesiavisionPage,
+		BluetoothConnectionVerifyPage
+	],
+	imports: [
+		BrowserModule,
+		HttpClientModule,
+		IonicModule.forRoot(MyApp)
+	],
+	bootstrap: [IonicApp],
+	entryComponents: [
+		MyApp,
 
-    WelcomePage,
-    LoginPage,
-    SignupPage,
-    SynesthesiavisionPage,
-    BluetoothConnectionVerifyPage
-  ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    BluetoothSerial,
-    MobileAccessibility,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
-  ]
+		SynesthesiavisionPage,
+		BluetoothConnectionVerifyPage
+	],
+	providers: [
+		StatusBar,
+		SplashScreen,
+		{provide: ErrorHandler, useClass: IonicErrorHandler},
+		
+		BluetoothSerial,
+		MobileAccessibility,
+		NativeStorage,
+		TextToSpeech,
+		Geolocation,
+		AndroidPermissions,
+
+		WeatherForecastProvider,
+		BluetoothProvider,
+		TextToSpeechProvider,
+		AudioProvider
+	]
 })
 export class AppModule {}

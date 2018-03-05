@@ -21,7 +21,7 @@
 	<!-- Espaçamento -->
 	<div class="spacer" style="width:300px;height:10px;" id="synesthesiaVision-spacer6"></div>
 	
-	<button id="synesthesiaVision-button1" ion-button style="font-size:20px;" color="pauseButton" block> INICIAR </button>
+	<button id="synesthesiaVision-button1" ion-button style="font-size:20px;" color="pauseButton" block (click)="toggleStatusButton()"> {{statusButton}} </button>
 	
 	<!-- Espaçamento -->
 	<div class="spacer" style="width:300px;height:10px;" id="synesthesiaVision-spacer7"></div>
@@ -29,8 +29,8 @@
 	<!-- Editor de frequência -->
 	<h4 id="synesthesiaVision-heading1" style="color:#FFFFFF;"> Frequência:	</h4>
 	
-	<button id="synesthesiaVision-button5" ion-button style="font-size:35px;" color="frequencyButton" block> + </button>
-	<button id="synesthesiaVision-button3" ion-button style="font-size:45px;" color="frequencyButton" block> - </button>
+	<button id="synesthesiaVision-button5" ion-button style="font-size:35px;" color="frequencyButton" block (click)="increaseFrequency()"> + </button>
+	<button id="synesthesiaVision-button3" ion-button style="font-size:45px;" color="frequencyButton" block (click)="decreaseFrequency()"> - </button>
 	
 	<!-- Espaçamento -->
 	<div class="spacer" style="width:300px;height:10px;" id="synesthesiaVision-spacer8"></div>
