@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { MobileAccessibility } from '@ionic-native/mobile-accessibility';
 import { WeatherForecastProvider } from '../../providers/weather-forecast/weather-forecast';
 import { Geolocation } from '@ionic-native/geolocation';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
 
 /**
  * Generated class for the SynesthesiavisionPage page.
@@ -23,7 +24,7 @@ export class SynesthesiavisionPage {
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, 
 				public mobileAccessibility: MobileAccessibility, public weatherForecast: WeatherForecastProvider,
-				public geolocation: Geolocation) {
+				public geolocation: Geolocation, public locationAccuracy: LocationAccuracy) {
 
 		//  Modificar futuramente para permitir a acessibilidade do usuário
 		if(mobileAccessibility.isScreenReaderRunning()){
@@ -60,26 +61,35 @@ export class SynesthesiavisionPage {
 		// Pegar a longitude do gps
 		let long: number;
 
-		// Verificar se gps está ligado, e
-		// se pode pegar a localização
+		this.locationAccuracy.canRequest().then((canRequest: boolean) => {
 
-		//if(this.getPermissions()){
-			this.geolocation.getCurrentPosition().then((result) => {
-				lat = result.coords.latitude;
-				long = result.coords.longitude;
-				
-				// Utiliza o provider para settar as coordenadas
-				this.weatherForecast.setCoordinates(lat.toString(), long.toString());
+			if(canRequest) {
 
-				this.weatherForecast.getWeather();
-			}, (err) => {
+				this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then((success) => {
+					
+					this.geolocation.getCurrentPosition().then((result) => {
+						lat = result.coords.latitude;
+						long = result.coords.longitude;
+						
+						// Utiliza o provider para settar as coordenadas
+						this.weatherForecast.setCoordinates(lat.toString(), long.toString());
+			
+						this.weatherForecast.getWeather();
+					}, (err) => {
+			
+						console.log('Não foi possível localizar sua posição. ' + err.code + ' message: ' + err.message);
+					}). catch((err) => {
+			
+						console.log('Could not handle geolocation Promise.');
+					});
 
-				console.log('Não foi possível localizar sua posição. ' + err.code + ' message: ' + err.message);
-			}). catch((err) => {
+				}, (error) => {
+					console.log('Error requesting location permissions', error);
+				});
+			}
+			
+		});
 
-				console.log('Could not handle geolocation Promise.');
-			});
-		//}
 		// Se o gps não puder pegar a localização
 		// Enviar string para ser lida pelo talkBack, 
 		//dizendo que o gp está offline

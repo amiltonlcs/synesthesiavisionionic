@@ -62,6 +62,10 @@ export class BluetoothConnectionVerifyPage {
         this.createLoading();
         this.loading.present();
 
+        while(!this.bluetoothSerial.isEnabled()){
+            this.checkEnabledBluetooth();
+        }
+
         //Verifica os dispositivos não pareados 
         this.bluetoothSerial.discoverUnpaired().then((success) => {
 
@@ -72,7 +76,7 @@ export class BluetoothConnectionVerifyPage {
             //Deixa de exibir o loading spinner
             this.loading.dismiss();
 
-            this.synesthesia();
+            //this.synesthesia();
         },
         (err) => {
             console.log('Deu ERRO: ' + err);
@@ -265,20 +269,32 @@ export class BluetoothConnectionVerifyPage {
     }
 
     getPermissions(){
-		this.permissions.checkPermission(this.permissionsNeeded).then((result) => {
 
-            if(!result.hasPermission){
-                
-                this.permissions.requestPermission(result);
-            }
+        this.permissionsNeeded.forEach(element => {
 
-            console.log(result + ' has permission? ' + result.hasPermission);
-		}, (err) => {
+            this.permissions.checkPermission(element).then((result) => {
 
-            console.log('Erro ocorreu: ' + err);
-		}).catch((err) => {
-           
-            console.log('Could not handle checkPermission Promise. ' + err);
+                console.log(result + ' has permission? ' + result.hasPermission);
+
+                if(!result.hasPermission){
+                    console.log('Entrou no request Permission');
+                    this.permissions.requestPermission(result).then((success) => {
+                        console.log('requested :' + success);
+                    }, (err) => {
+                        console.log('Requested Error: ' + err);
+                        
+                    });
+                }
+    
+                console.log(result + ' has permission? ' + result.hasPermission);
+            }, (err) => {
+    
+                console.log('Error occuried: ' + err);
+            }).catch((err) => {
+               
+                console.log('Could not handle checkPermission Promise. ' + err);
+            });
+            
         });
 	}
 }

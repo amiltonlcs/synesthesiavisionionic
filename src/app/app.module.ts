@@ -17,12 +17,14 @@ import { NativeStorage } from "@ionic-native/native-storage";
 import { TextToSpeech } from "@ionic-native/text-to-speech";
 import { Geolocation } from "@ionic-native/geolocation";
 import { AndroidPermissions } from "@ionic-native/android-permissions";
+import { LocationAccuracy } from "@ionic-native/location-accuracy";
 
 // Services imports
 import { AudioProvider } from '../providers/audio/audio';
 import { BluetoothProvider } from '../providers/bluetooth/bluetooth';
 import { WeatherForecastProvider } from '../providers/weather-forecast/weather-forecast';
 import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech';
+import { SoundTrackerProvider } from '../providers/sound-tracker/sound-tracker';
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
@@ -55,11 +57,13 @@ import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech
 		TextToSpeech,
 		Geolocation,
 		AndroidPermissions,
+		LocationAccuracy,
 
 		WeatherForecastProvider,
 		BluetoothProvider,
 		TextToSpeechProvider,
-		AudioProvider
+		AudioProvider,
+    SoundTrackerProvider
 	]
 })
 export class AppModule {}

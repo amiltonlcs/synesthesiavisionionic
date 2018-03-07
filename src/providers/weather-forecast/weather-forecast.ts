@@ -41,18 +41,19 @@ export class WeatherForecastProvider {
 		//Trocar a key 
 		let openWeatherAppKey = '457dbe6ae9995dbadf75c7a34f1d8e03';
 		let url = 'http://api.openweathermap.org/data/2.5/weather?lang=pt';
-		let Currentlang = 'pt';
+		let Currentlang = 'pt'; // Linguagem da descrição em portugues
+		let unidade = 'metric'; // Unidade em  ° C
 
 		let resultado: any;
 
-		this.http.get(url, {params: {lat: this.latitude, lon: this.longitude, lang: Currentlang, appid: openWeatherAppKey}, responseType: 'json'})
+		this.http.get(url, {params: {lat: this.latitude, lon: this.longitude, lang: Currentlang, units: unidade, appid: openWeatherAppKey}, responseType: 'json'})
 			.map(res => {
 				resultado = res;
 			})	
 			.subscribe((success)=>{
 
 				this.tts.speak({
-					text: resultado.weather[0].description,
+					text: resultado.weather[0].description + ' e temperatura de ' + resultado.main.temp + ' °C',
 					locale: 'pt-BR',
 					rate: 0.75
 				}).then((success) => {
