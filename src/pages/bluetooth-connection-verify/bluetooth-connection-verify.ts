@@ -119,11 +119,11 @@ export class BluetoothConnectionVerifyPage {
      * Redireciona para a tela principal se o usuário desejar se conectar
      * @param address
      */
-    selectDevice(address: any) {
+    selectDevice(device: any) {
 
         let alert = this.alertCtrl.create({
         title: 'Connect',
-        message: 'Do you want to connect with' + address + '?',
+        message: 'Do you want to connect with' + device.address + '?',
         buttons: 
             [
                 {
@@ -138,11 +138,16 @@ export class BluetoothConnectionVerifyPage {
                     text: 'Connect',
 
                     handler: () => {
-                        this.bluetoothSerial.connect(address).subscribe((success)=> {
-                            this.saveAddress(address);
-                            //Após conectar direcionar para a página principal do synesthesia
+                        this.bluetoothSerial.connect(device.address).subscribe((success)=> {
 
-                            this.synesthesia();
+                            if(device.name === 'Synesthesia'){
+
+                                this.saveAddress(device.address);
+    
+                                //Após conectar direcionar para a página principal do synesthesia
+                                this.synesthesia();
+                            }
+                            
                             console.log(success);
                         }, (error) => {
                             console.log(error);
