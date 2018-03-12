@@ -148,7 +148,6 @@ export class BluetoothConnectionVerifyPage {
                                 this.synesthesia();
                             }
                             
-                            console.log(success);
                         }, (error) => {
                             console.log(error);
                         });

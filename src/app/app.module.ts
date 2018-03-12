@@ -19,6 +19,7 @@ import { Geolocation } from "@ionic-native/geolocation";
 import { AndroidPermissions } from "@ionic-native/android-permissions";
 import { LocationAccuracy } from "@ionic-native/location-accuracy";
 import { HTTP } from '@ionic-native/http';
+import { Vibration } from "@ionic-native/vibration";
 
 
 // Services imports
@@ -60,6 +61,7 @@ import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech
 		AndroidPermissions,
 		LocationAccuracy,
 		HTTP,
+		Vibration,
 
 		WeatherForecastProvider,
 		BluetoothProvider,

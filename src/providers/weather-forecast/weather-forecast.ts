@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { AlertController } from 'ionic-angular';
 import { TextToSpeech } from '@ionic-native/text-to-speech';
 import { HTTP } from '@ionic-native/http';
+import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
 
 /*
   Generated class for the WeatherForecastProvider provider.
@@ -15,7 +16,7 @@ export class WeatherForecastProvider {
 	latitude: string;
 	longitude: string;
 
-	constructor(public http: HTTP, public alertCtrl: AlertController, public tts: TextToSpeech) {
+	constructor(public http: HTTP, public alertCtrl: AlertController, public tts: TextToSpeech, public ttsProvider: TextToSpeechProvider) {
 		console.log('Hello WeatherForecastProvider Provider');
 	}
 
@@ -50,31 +51,18 @@ export class WeatherForecastProvider {
 		this.http.get(url, {lat: this.latitude, lon: this.longitude, lang: Currentlang, units: unidade, appid: openWeatherAppKey}, {responseType: 'json'}).then((success) => {
 
 			resultado = JSON.parse(success.data);
-			console.log(resultado.weather[0]);
 			
-			this.tts.speak({
-				text: resultado.weather[0].description + ' e temperatura de ' + resultado.main.temp + ' °C',
-				locale: 'pt-BR',
-				rate: 0.75
-			}).then((success) => {
-				console.log(success);
-			}, (err) => {
-				console.log(err)
-			});
+			this.ttsProvider.speak(resultado.weather[0].description + ' e temperatura de ' + resultado.main.temp + ' °C');
 
-			console.log('Resultado: ' + resultado.weather[0].main);				
-				
 		}, (err) => {
 
 			let alert = this.alertCtrl.create({
-				title: 'sucesso',
+				title: 'Erro',
 				message: err,
 				buttons: ['OK']
 			});
 	
 			alert.present();
-
-			console.log('ERROR: ' + err);
 		});
 	}
 }

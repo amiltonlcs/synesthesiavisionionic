@@ -93,4 +93,5 @@
     <plugin name="cordova-plugin-request-location-accuracy" spec="^2.2.2" />
     <engine name="android" spec="~7.0.0" />
     <plugin name="cordova-plugin-advanced-http" spec="^1.11.0" />
+    <plugin name="cordova-plugin-vibration" spec="^3.0.1" />
 </widget>
