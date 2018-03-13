@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 
 /*
   Generated class for the BluetoothProvider provider.
@@ -10,8 +11,24 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class BluetoothProvider {
 
-	constructor(public http: HttpClient) {
+	constructor(public http: HttpClient, public bluetoothSerial: BluetoothSerial) {
 		console.log('Hello BluetoothProvider Provider');
+	}
+
+	getData (): any{
+		this.bluetoothSerial.subscribeRawData().subscribe((success) => {
+
+			this.bluetoothSerial.read().then(success => {
+				console.log('sucesso : ' + success);
+			}, err => {
+				console.log('error: ' + err);
+				
+			})
+			
+			return success;
+		}, (err) => {
+			return err;
+		});
 	}
 
 }

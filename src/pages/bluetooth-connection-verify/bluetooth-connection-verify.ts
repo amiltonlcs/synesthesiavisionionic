@@ -3,7 +3,7 @@ import { IonicPage, NavController, NavParams, AlertController, LoadingController
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { SynesthesiavisionPage } from '../synesthesiavision/synesthesiavision';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { AndroidPermissions } from '@ionic-native/android-permissions';
+import { PermissionProvider } from '../../providers/permission/permission';
 
 
 /**
@@ -21,25 +21,19 @@ import { AndroidPermissions } from '@ionic-native/android-permissions';
 
 export class BluetoothConnectionVerifyPage {
 
-	unpairedDevices: any;
-    pairedDevices: any;
-    gettingDevices: Boolean;
-    loading: any;
-
-    private permissionsNeeded: any =  [
-		this.permissions.PERMISSION.ACCESS_FINE_LOCATION,
-		this.permissions.PERMISSION.ACCESS_COARSE_LOCATION,
-		this.permissions.PERMISSION.INTERNET
-	];
+	unpairedDevices  : any;
+    pairedDevices    : any;
+    gettingDevices   : boolean;
+    loading          : any;
 
 	constructor(
         private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
         public navParams: NavParams, public alertCtrl: AlertController, 
         public loadingCtrl: LoadingController, public nativeStorage: NativeStorage,
-        public permissions: AndroidPermissions) {
+        public permissionsProvider: PermissionProvider) {
         
         this.checkEnabledBluetooth();
-        this.getPermissions();
+        this.permissionsProvider.getPermissions();
 	}
 
   	ionViewDidLoad() {
@@ -271,34 +265,4 @@ export class BluetoothConnectionVerifyPage {
             this.bluetoothSerial.enable();
         }
     }
-
-    getPermissions(){
-
-        this.permissionsNeeded.forEach(element => {
-
-            this.permissions.checkPermission(element).then((result) => {
-
-                console.log(result + ' has permission? ' + result.hasPermission);
-
-                if(!result.hasPermission){
-                    console.log('Entrou no request Permission');
-                    this.permissions.requestPermission(result).then((success) => {
-                        console.log('requested :' + success);
-                    }, (err) => {
-                        console.log('Requested Error: ' + err);
-                        
-                    });
-                }
-    
-                console.log(result + ' has permission? ' + result.hasPermission);
-            }, (err) => {
-    
-                console.log('Error occuried: ' + err);
-            }).catch((err) => {
-               
-                console.log('Could not handle checkPermission Promise. ' + err);
-            });
-            
-        });
-	}
 }

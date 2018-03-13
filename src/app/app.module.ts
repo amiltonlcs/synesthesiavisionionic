@@ -27,6 +27,7 @@ import { AudioProvider } from '../providers/audio/audio';
 import { BluetoothProvider } from '../providers/bluetooth/bluetooth';
 import { WeatherForecastProvider } from '../providers/weather-forecast/weather-forecast';
 import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech';
+import { PermissionProvider } from '../providers/permission/permission';
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
@@ -66,7 +67,8 @@ import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech
 		WeatherForecastProvider,
 		BluetoothProvider,
 		TextToSpeechProvider,
-		AudioProvider
+		AudioProvider,
+    	PermissionProvider
 	]
 })
 export class AppModule {}

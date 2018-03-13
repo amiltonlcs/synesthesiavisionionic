@@ -13,8 +13,8 @@ import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
 @Injectable()
 export class WeatherForecastProvider {
 
-	latitude: string;
-	longitude: string;
+	private latitude  : string;
+	private longitude : string;
 
 	constructor(public http: HTTP, public alertCtrl: AlertController, public tts: TextToSpeech, public ttsProvider: TextToSpeechProvider) {
 		console.log('Hello WeatherForecastProvider Provider');
@@ -40,12 +40,11 @@ export class WeatherForecastProvider {
 		//Não existe mais? Falar com Michael
 		//let url = 'http://sweetglass.azurewebsites.net/weather';
 		//Trocar a key 
-		let openWeatherAppKey = '457dbe6ae9995dbadf75c7a34f1d8e03';
-		let url = 'http://api.openweathermap.org/data/2.5/weather?lang=pt';
-		let Currentlang = 'pt'; // Linguagem da descrição em portugues
-		let unidade = 'metric'; // Unidade em  ° C
-
-		let resultado: any;
+		let openWeatherAppKey : string = '457dbe6ae9995dbadf75c7a34f1d8e03';
+		let url               : string = 'http://api.openweathermap.org/data/2.5/weather?lang=pt';
+		let Currentlang       : string = 'pt'; // Linguagem da descrição em portugues
+		let unidade           : string = 'metric'; // Unidade em  ° C
+		let resultado         : any;
 
 		this.http.setRequestTimeout(15);
 		this.http.get(url, {lat: this.latitude, lon: this.longitude, lang: Currentlang, units: unidade, appid: openWeatherAppKey}, {responseType: 'json'}).then((success) => {

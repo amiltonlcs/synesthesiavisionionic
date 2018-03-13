@@ -11,10 +11,10 @@ import { TextToSpeech } from '@ionic-native/text-to-speech';
 @Injectable()
 export class TextToSpeechProvider {
 
-	private ttsLocal: string = 'pt-BR';
-	private ttsRate: number = 0.75;
-	private ttsText: string;
-	private TTSOptions: any;
+	private ttsLocal   : string = 'pt-BR';
+	private ttsRate    : number = 0.75;
+	private ttsText    : string;
+	private TTSOptions : any;
 
 	constructor(public http: HttpClient, public tts: TextToSpeech) {
 		console.log('Hello TextToSpeechProvider Provider');
@@ -22,18 +22,18 @@ export class TextToSpeechProvider {
 
 	createTTSOptions(message: string = 'No message provided', rate: number = 1, local: string = 'pt-BR'){
 		this.TTSOptions = {
-			text: message,
-			locale: local,
-			rate: rate
+			text   : message,
+			locale : local,
+			rate   : rate
 		};
 	}
 
 	speak(message: string){
 
 		this.tts.speak({
-			text: message,
-			locale: 'pt-BR',
-			rate: 1
+			text   : message,
+			locale : 'pt-BR',
+			rate   : 1
 		}).then((success) => {
 			console.log(success);
 		}, (err) => {
