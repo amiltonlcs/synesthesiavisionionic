@@ -27,6 +27,15 @@ export class AudioProvider {
 		console.log('Hello AudioProvider Provider');
 	}
 
+	playSoundOscillator(){
+		let osc = this._context.createOscillator(); // instantiate an oscillator
+		osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
+		osc.frequency.value = 440; // Hz
+		osc.connect(this._context.destination); // connect it to the destination
+		osc.start(); // start the oscillator
+		osc.stop(this._context.currentTime + 2); // stop 2 seconds after the current time
+	}
+
 	loadSound(track){
 
 		this.displayPreloader('Loading track...');
@@ -43,7 +52,7 @@ export class AudioProvider {
 			this._audio = buffer;
 			this._track = this._audio;
 
-			this.playSound(this._track);
+			this.panner(this._track);
 		});
 	}
 	
@@ -90,6 +99,22 @@ export class AudioProvider {
 		// handle this situation
 		console.log('Volume: ' + percentile);
 		this._gain.gain.value = percentile * percentile;
+	}
+
+	panner(track){
+
+		this._gain = this._context.createStereoPanner();
+
+		this._source = this._context.createBufferSource();
+		this._source.buffer = track;
+		
+		this._gain.pan.value = 1;
+		
+		this._source.connect(this._gain);
+		this._gain.connect(this._context.destination);
+
+		this._source.start(0);
+		this.hidePreloader();
 	}
 
 }

@@ -53,7 +53,20 @@ export class SynesthesiavisionPage {
 	private minLimitRange     : string = 'Frequência mínima atingida';
 	private startCheckWeather : string = 'Previsão do tempo acionada';
 	private gpsDeactived      : string = 'GPS desativado, impossível obter localização do usuário';
-	private alreadyRequesting : string = 'Processando previsão do tempo'
+	private alreadyRequesting : string = 'Processando previsão do tempo';
+
+	public tracks: any = [
+		{
+		   	artist  : 'Time Synesthesia',
+			name    : 'Confirmar bluetooth',
+		   	track   : 'assets/sounds/bluetooth_confirma.ogg'
+		},
+		{
+			artist  : 'Time Synesthesia',
+		   	name    : 'Finalizar aplicativo',
+		   	track   : 'assets/sounds/finalizar.ogg'
+		}
+	];
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, 
 				public mobileAccessibility: MobileAccessibility, public weatherForecast: WeatherForecastProvider,
@@ -266,32 +279,6 @@ export class SynesthesiavisionPage {
 	private getBluetoothData(){
 		
 		this.rx_buffer = this.bluetoothProvider.getData();
-		
 	}
-
-	/**
-     * Send complete messages from the rx_buffer to the read handler.
-     */
-    private parseMessages() {
-
-        // Find the first delimiter in the buffer
-        let inx = this.rx_buffer.indexOf(this.DELIMITER);
-
-        // If there is none, exit
-        if (inx == -1)
-            return;
-
-        // Get the complete message
-        let s = this.rx_buffer.substring(0, inx);
-
-        // Remove the message from the buffer
-        this.rx_buffer = this.rx_buffer.substring(inx + 1);
-
-		
-		console.log('mensagem: ' + s)
-
-        // Look for more complete messages
-        this.parseMessages();
-    }
 
 }

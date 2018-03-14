@@ -4,6 +4,7 @@ import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { SynesthesiavisionPage } from '../synesthesiavision/synesthesiavision';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { PermissionProvider } from '../../providers/permission/permission';
+import { AudioProvider } from '../../providers/audio/audio';
 
 
 /**
@@ -21,16 +22,43 @@ import { PermissionProvider } from '../../providers/permission/permission';
 
 export class BluetoothConnectionVerifyPage {
 
+    //Bluetooth Variables
 	unpairedDevices  : any;
     pairedDevices    : any;
     gettingDevices   : boolean;
     loading          : any;
 
+    //Sound Variables
+    public volume: any = 50;
+	public isPlaying: boolean = false;
+    public tracks: any = [
+		{
+		   	artist  : 'Time Synesthesia',
+			name    : 'Confirmar bluetooth',
+		   	track   : 'assets/sounds/bluetooth_confirma.ogg'
+		},
+		{
+			artist  : 'Time Synesthesia',
+		   	name    : 'Erro bluetooth',
+		   	track   : 'assets/sounds/bluetooth_erro.ogg'
+		},
+		{
+			artist  : 'Time Synesthesia',
+		   	name    : 'Som synesthesia',
+		   	track   : 'assets/sounds/synesthesia_sound.ogg'
+		},
+		{
+			artist  : 'Time Synesthesia',
+		   	name    : 'Finalizar aplicativo',
+		   	track   : 'assets/sounds/finalizar.ogg'
+		}
+	];
+
 	constructor(
         private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
         public navParams: NavParams, public alertCtrl: AlertController, 
         public loadingCtrl: LoadingController, public nativeStorage: NativeStorage,
-        public permissionsProvider: PermissionProvider) {
+        public permissionsProvider: PermissionProvider, public audioProvider: AudioProvider) {
         
         this.checkEnabledBluetooth();
         this.permissionsProvider.getPermissions();
@@ -264,5 +292,44 @@ export class BluetoothConnectionVerifyPage {
         if(this.bluetoothSerial.isEnabled()){
             this.bluetoothSerial.enable();
         }
+    }
+
+    /* Audio Methods
+       .
+       .
+       .
+    */ 
+    loadSound(track : string){
+		if(!this.isPlaying){
+			this.triggerPlayback(track);
+		}
+		else{
+			this.isPlaying  = false;
+			this.stopPlayback();
+			this.triggerPlayback(track);
+		}
+	}
+
+	triggerPlayback(track : string){
+		this.audioProvider.loadSound(track);
+		this.isPlaying  = true;
+	}
+
+	changeVolume(volume : any){
+		console.log(volume.value);
+		this.audioProvider.changeVolume(volume.value);
+	}
+
+	stopPlayback(){
+		this.isPlaying  = false;
+		this.audioProvider.stopSound();
+	}
+
+	playSoundOscillator(){
+		this.audioProvider.playSoundOscillator();
+    }
+    
+    panner(track){
+        this.audioProvider.panner(track);
     }
 }

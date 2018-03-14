@@ -20,6 +20,7 @@ import { AndroidPermissions } from "@ionic-native/android-permissions";
 import { LocationAccuracy } from "@ionic-native/location-accuracy";
 import { HTTP } from '@ionic-native/http';
 import { Vibration } from "@ionic-native/vibration";
+import { HttpModule } from "@angular/http";
 
 
 // Services imports
@@ -40,6 +41,7 @@ import { PermissionProvider } from '../providers/permission/permission';
 	imports: [
 		BrowserModule,
 		HttpClientModule,
+		HttpModule,
 		IonicModule.forRoot(MyApp)
 	],
 	bootstrap: [IonicApp],

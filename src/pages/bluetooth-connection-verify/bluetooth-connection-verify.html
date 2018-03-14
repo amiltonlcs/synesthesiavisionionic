@@ -39,6 +39,10 @@
 		</span>
 	</ion-item>
 	
+
+	<button *ngFor="let track of tracks" ion-button block color="primary" (click)="loadSound(track.track)">
+		{{ track.artist}} - {{ track.name }}
+	</button>
 	<!-- <ion-spinner name="crescent" *ngIf="gettingDevices"></ion-spinner> -->
 
 </ion-content>

@@ -16,18 +16,20 @@ export class BluetoothProvider {
 	}
 
 	getData (): any{
-		this.bluetoothSerial.subscribeRawData().subscribe((success) => {
+		// this.bluetoothSerial.subscribeRawData().subscribe((success) => {
 
-			this.bluetoothSerial.read().then(success => {
-				console.log('sucesso : ' + success);
-			}, err => {
-				console.log('error: ' + err);
-				
-			})
 			
-			return success;
-		}, (err) => {
-			return err;
+			
+		// 	return success;
+		// }, (err) => {
+		// 	return err;
+		// });
+
+		this.bluetoothSerial.read().then(success => {
+			console.log('sucesso : ' + success);
+		}, err => {
+			console.log('error: ' + err);
+			
 		});
 	}
 
