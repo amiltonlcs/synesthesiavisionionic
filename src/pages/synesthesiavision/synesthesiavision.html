@@ -14,30 +14,30 @@
 -->
 
 <ion-content padding id="page1" style="background-color:#000000;">
-	
+
 	<!-- Imagem do synesthesia -->
 	<img src="assets/imgs/synesthesia_image.png" style="display:block;width:100%;height:auto;margin-left:auto;margin-right:auto;" />
-	
+
 	<!-- Espaçamento -->
 	<div class="spacer" style="width:300px;height:10px;" id="synesthesiaVision-spacer6"></div>
-	
+
 	<button id="synesthesiaVision-button1" ion-button style="font-size:20px;" color="pauseButton" block (click)="toggleStatusButton()"> {{statusButton}} </button>
-	
+
 	<!-- Espaçamento -->
 	<div class="spacer" style="width:300px;height:10px;" id="synesthesiaVision-spacer7"></div>
-	
+
 	<!-- Editor de frequência -->
 	<h4 id="synesthesiaVision-heading1" style="color:#FFFFFF;"> Frequência:	</h4>
-	
+
 	<button id="synesthesiaVision-button5" ion-button style="font-size:35px;" color="frequencyButton" block (click)="increaseFrequency()"> + </button>
 	<button id="synesthesiaVision-button3" ion-button style="font-size:45px;" color="frequencyButton" block (click)="decreaseFrequency()"> - </button>
-	
+
 	<!-- Espaçamento -->
 	<div class="spacer" style="width:300px;height:10px;" id="synesthesiaVision-spacer8"></div>
-	
+
 	<!-- Visualizar clima -->
 	<h4 id="synesthesiaVision-heading2" style="color:#FFFFFF;"> Conexões: </h4>
-	
-	<img src="assets/imgs/weather_forecast_96px.png" (click)="checkWeather()" style="display:block;width:45%;height:96;margin-left:auto;margin-right:auto;" />
 
+	<img src="assets/imgs/weather_forecast_96px.png" (click)="checkWeather()" style="display:block;width:45%;height:96;margin-left:auto;margin-right:auto;" />
+  <hr>
 </ion-content>
