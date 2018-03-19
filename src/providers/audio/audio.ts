@@ -16,6 +16,7 @@ declare var	webkitAudioContext: any;
 @Injectable()
 export class AudioProvider {
 
+	//Web Audio Api variables
 	private _preloader : any;
 	private _track : any = null;
 	private _audio : any;
@@ -23,8 +24,22 @@ export class AudioProvider {
 	private _context : any = new (AudioContext || webkitAudioContext)();
 	private _gain : any = null;
 
+	//Controlling Variables
+	private volumeEsquerdo;
+	private volumeDireito;
+	private frequencia;
+
 	constructor(public http: Http, private _LOADER: LoadingController) {
 		console.log('Hello AudioProvider Provider');
+	}
+
+	setVolume(volumeEsquerdo, volumeDireito){
+		this.volumeEsquerdo = volumeEsquerdo;
+		this.volumeDireito = volumeDireito;
+	}
+
+	setRate(frequency){
+		this.frequencia = frequency;
 	}
 
 	playSoundOscillator(){
@@ -52,7 +67,7 @@ export class AudioProvider {
 			this._audio = buffer;
 			this._track = this._audio;
 
-			this.panner(this._track);
+			this.test(this._track);
 		});
 	}
 	
@@ -108,7 +123,7 @@ export class AudioProvider {
 		this._source = this._context.createBufferSource();
 		this._source.buffer = track;
 		
-		this._gain.pan.value = 1;
+		this._gain.pan.value = 0;
 		
 		this._source.connect(this._gain);
 		this._gain.connect(this._context.destination);
@@ -117,4 +132,34 @@ export class AudioProvider {
 		this.hidePreloader();
 	}
 
+	test(track){
+
+		this._gain = this._context.createStereoPanner();
+		let biquadFilter = this._context.createBiquadFilter();
+		this._source = this._context.createBufferSource();
+
+		//Create the source
+		this._source.buffer = track;
+		this._gain.pan.value = 0;
+
+		// Descobrir como funciona o filtro
+		biquadFilter.type = "lowshelf";
+		biquadFilter.frequency.value = 350;
+		biquadFilter.gain.value = 5; // Volume do gain
+		biquadFilter.detune.value = 440;
+
+		this._source.connect(this._gain);
+		this._gain.connect(biquadFilter);
+		biquadFilter.connect(this._context.destination);
+		
+		this._source.loop = false; // Som em loop?
+		this._source.playbackRate.value = 1.0; // Velocidade de reprodução do som
+		this._source.start(0); // Inicia a reprodução do som
+		this.hidePreloader();
+	}
+
+
+	defineSound(){
+		this.loadSound('assets/sounds/bu.ogg');
+	}
 }

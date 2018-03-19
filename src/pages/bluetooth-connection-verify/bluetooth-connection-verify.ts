@@ -65,7 +65,8 @@ export class BluetoothConnectionVerifyPage {
 	}
 
   	ionViewDidLoad() {
-    	console.log('ionViewDidLoad BluetoothConnectionVerifyPage');
+        console.log('ionViewDidLoad BluetoothConnectionVerifyPage');
+        this.loadSound('assets/sounds/synesthesia_sound.ogg');
   	}
 
 	/**
@@ -164,6 +165,7 @@ export class BluetoothConnectionVerifyPage {
 
                             if(device.name === 'Synesthesia'){
 
+                                this.loadSound('assets/sounds/bluetooth_confirma.ogg');
                                 this.saveAddress(device.address);
     
                                 //Após conectar direcionar para a página principal do synesthesia
@@ -278,9 +280,12 @@ export class BluetoothConnectionVerifyPage {
      * @param address
      */
     autoConnect(address: string){
-        this.bluetoothSerial.connect(address).subscribe(this.success, this.fail);
-
-        this.synesthesia();
+        this.bluetoothSerial.connect(address).subscribe((success) => {
+            this.loadSound('assets/sounds/bluetooth_confirma.ogg');
+            this.synesthesia();
+        }, (fail) => {
+            this.loadSound('assets/sounds/bluetooth_erro.ogg');
+        });
     }
 
     /** 

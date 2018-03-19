@@ -7,6 +7,8 @@ import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { TextToSpeechProvider } from '../../providers/text-to-speech/text-to-speech';
 import { Vibration } from '@ionic-native/vibration';
 import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
+import { AudioProvider } from '../../providers/audio/audio';
+import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 
 /**
  * Generated class for the SynesthesiavisionPage page.
@@ -72,7 +74,8 @@ export class SynesthesiavisionPage {
 				public mobileAccessibility: MobileAccessibility, public weatherForecast: WeatherForecastProvider,
 				public geolocation: Geolocation, public locationAccuracy: LocationAccuracy,
 				public ttsProvider: TextToSpeechProvider, public vibrator: Vibration,
-				public bluetoothProvider: BluetoothProvider) {
+				public bluetoothProvider: BluetoothProvider, public bluetoothSerial: BluetoothSerial,
+				public audioProvider: AudioProvider) {
 
 		// Modificar futuramente para permitir a acessibilidade do usuário
 		if(mobileAccessibility.isScreenReaderRunning()){
@@ -91,11 +94,11 @@ export class SynesthesiavisionPage {
 	}
 
 	toggleStatusButton(){
-
+		this.getBluetoothData();
 		if(this.init){
 			this.statusButton = 'PAUSAR';
 
-			this.startSound();
+			this.playSound();
 
 			this.init = false;
 		} else {
@@ -107,7 +110,7 @@ export class SynesthesiavisionPage {
 		}
 	}
 
-	startSound(){
+	playSound(){
 		let frequency_sound = 1 / this.frequencySound * 1000;
 		this.frequencySoundMs = frequency_sound; // Hz to s
 
@@ -129,6 +132,9 @@ export class SynesthesiavisionPage {
 	//Implementar
 	createTimer(){
 
+		this.playAudio();
+		this.currentSensor++;
+		this.currentSensor %= 3;
 	}
 
 	// Implementar
@@ -136,9 +142,47 @@ export class SynesthesiavisionPage {
 
 	}
 
-	checkWeather(){
+	playAudio(){
+		let volume: number  = 1;
+		let frequency: number = 0.01;
 
-		this.getBluetoothData();
+        let values: number[] = [2];
+        values = this.getMinDistance(values);
+        let distance: number = values[0];
+        let sensor: number = values[1];
+
+        console.log("Min Distance: " + distance);
+
+        if (distance < this.DMAX) {
+            frequency = (this.DMIN * 2) / distance;
+        } else {
+            volume = 0.01;
+        }
+
+		this.audioProvider.setRate(frequency); //Set the specified frequency.
+
+		//Left Sensor
+		switch (sensor) {
+
+			case 0: //right
+				console.log("Right");
+				this.audioProvider.setVolume(0, volume);
+				break;
+
+			case 1: //front
+				console.log("Front");
+				this.audioProvider.setVolume((3 * volume / 4), (3 * volume / 4));
+				break;
+
+			case 2: //left
+
+				console.log("Left");
+				this.audioProvider.setVolume(volume, 0);  //Set the volume according to the sensor passed to function.
+				break;
+		}
+	}
+
+	checkWeather(){
 
 		if(this.canGetWeather){
 			// Aciona o tts para avisar que a previsão do tempo foi acionada
@@ -278,7 +322,52 @@ export class SynesthesiavisionPage {
      */
 	private getBluetoothData(){
 		
-		this.rx_buffer = this.bluetoothProvider.getData();
+		this.bluetoothSerial.subscribe(this.DELIMITER).subscribe((data) => {
+			this.rx_buffer = data;
+
+			if(this.rx_buffer === "getweather"){
+				this.checkWeather();
+				return;
+			}
+
+			console.log(this.rx_buffer);
+			
+
+			let inx = this.rx_buffer.indexOf(this.DELIMITER);
+	
+			//Get the first character responsable for indentifier the sensor
+			let sensor1 = this.rx_buffer.substring(0, 1);
+			
+			//Get the distance after character
+			let distance = "";
+			
+			try{
+				distance = this.rx_buffer.substring(1, inx);
+			} catch(err) {
+				console.log('Error: ' + err);
+			}
+			
+			//Get the primary character at message, which corresponds to sensor which has sent the distance
+			let sensor = sensor1.charAt(0);
+	
+			//If have any data, it will save.
+			if( typeof sensor === "string" && typeof distance.charAt(0) === "string") {
+				if (this.isEmpty(distance) && distance.search("DISCONNECTED") == -1) {
+					this.saveData(sensor, Number(distance));
+				}
+			}
+		}, (err) => {
+
+		});
+		
+	}
+
+	private isEmpty(data: string): boolean{
+		if(data.length == 0){
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 }
