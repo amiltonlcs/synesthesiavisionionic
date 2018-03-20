@@ -1,7 +1,6 @@
-import { AudioProvider } from './audio';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { NativeAudio } from '@ionic-native/native-audio'
+import { AudioProvider2 } from './audio';
 
  /**
  * Generated class for the SoundTrackerPage page.
@@ -17,13 +16,13 @@ import { NativeAudio } from '@ionic-native/native-audio'
 })
 export class SoundTrackerPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public nativeAudio: NativeAudio, public audio: AudioProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public audio: AudioProvider2) {
 
-    this.nativeAudio.preloadSimple('right', 'assets/sound/bu_right.ogg');
-    this.nativeAudio.preloadSimple('right_center', 'assets/sound/bu_right_center.ogg');
-    this.nativeAudio.preloadSimple('center', 'assets/sound/bu_center.ogg');
-    this.nativeAudio.preloadSimple('left_center', 'assets/sound/bu_left_center.ogg');
-    this.nativeAudio.preloadSimple('left', 'assets/sound/bu_left.ogg');
+    // this.nativeAudio.preloadSimple('right', 'assets/sound/bu_right.ogg');
+    // this.nativeAudio.preloadSimple('right_center', 'assets/sound/bu_right_center.ogg');
+    // this.nativeAudio.preloadSimple('center', 'assets/sound/bu_center.ogg');
+    // this.nativeAudio.preloadSimple('left_center', 'assets/sound/bu_left_center.ogg');
+    // this.nativeAudio.preloadSimple('left', 'assets/sound/bu_left.ogg');
 
 
   }
@@ -35,6 +34,7 @@ export class SoundTrackerPage {
   sensor : number[] = [150,190,190];
 
   defineSound(sensor: number[]){
+    
 
    if(this.sensor[0] < this.sensor[1] && this.sensor[0] < this.sensor[2]){
 
@@ -61,8 +61,8 @@ export class SoundTrackerPage {
     let variaveis: any = { side: Number, sound_duration: Number, track: String, frequencia: Number};
 
     variaveis.side = audioNumber;
-    variaveis.sound_duration = 1;
-    variaveis.track = 'assets/sound/bu.ogg';
+    variaveis.sound_duration = 0.8;
+    variaveis.track = 'assets/sounds/bu.ogg';
     variaveis.frequencia = frequencia;
 
     this.audio.startSound(variaveis);
@@ -73,7 +73,8 @@ export class SoundTrackerPage {
       this.defineSoundWebApi(this.sensor);
 
     },
-    frequencia);
+    1200);
+    
 
 
   }

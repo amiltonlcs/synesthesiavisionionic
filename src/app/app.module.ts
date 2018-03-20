@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 // Pages imports 
 import { SynesthesiavisionPage } from '../pages/synesthesiavision/synesthesiavision';
 import { BluetoothConnectionVerifyPage } from "../pages/bluetooth-connection-verify/bluetooth-connection-verify";
+import { SoundTrackerPage } from "../pages/sound-tracker/sound-tracker";
 
 // Plugins imports
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
@@ -29,6 +30,7 @@ import { BluetoothProvider } from '../providers/bluetooth/bluetooth';
 import { WeatherForecastProvider } from '../providers/weather-forecast/weather-forecast';
 import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech';
 import { PermissionProvider } from '../providers/permission/permission';
+import { AudioProvider2 } from "../pages/sound-tracker/audio";
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
@@ -36,7 +38,8 @@ import { PermissionProvider } from '../providers/permission/permission';
 		MyApp,
 
 		SynesthesiavisionPage,
-		BluetoothConnectionVerifyPage
+		BluetoothConnectionVerifyPage,
+		SoundTrackerPage
 	],
 	imports: [
 		BrowserModule,
@@ -49,7 +52,8 @@ import { PermissionProvider } from '../providers/permission/permission';
 		MyApp,
 
 		SynesthesiavisionPage,
-		BluetoothConnectionVerifyPage
+		BluetoothConnectionVerifyPage,
+		SoundTrackerPage
 	],
 	providers: [
 		StatusBar,
@@ -70,7 +74,8 @@ import { PermissionProvider } from '../providers/permission/permission';
 		BluetoothProvider,
 		TextToSpeechProvider,
 		AudioProvider,
-    	PermissionProvider
+		PermissionProvider,
+		AudioProvider2
 	]
 })
 export class AppModule {}

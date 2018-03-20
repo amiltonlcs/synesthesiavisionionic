@@ -5,6 +5,7 @@ import { SynesthesiavisionPage } from '../synesthesiavision/synesthesiavision';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { PermissionProvider } from '../../providers/permission/permission';
 import { AudioProvider } from '../../providers/audio/audio';
+import { SoundTrackerPage } from '../sound-tracker/sound-tracker';
 
 
 /**
@@ -24,7 +25,6 @@ export class BluetoothConnectionVerifyPage {
 
     //Bluetooth Variables
 	unpairedDevices  : any;
-    pairedDevices    : any;
     gettingDevices   : boolean;
     loading          : any;
 
@@ -75,7 +75,6 @@ export class BluetoothConnectionVerifyPage {
      */
 	startScanning() { 
 
-        this.pairedDevices = null;
         this.unpairedDevices = null;
         this.gettingDevices = true;
 
@@ -109,16 +108,13 @@ export class BluetoothConnectionVerifyPage {
 
             //Caso ocorra algum erro, exibe qual foi o erro
             this.showAlert(err);
-        })
+        });
 
         //Lista os dispositivos pareados
         this.bluetoothSerial.list().then((success) => {
 
-            //Lista dos devices pareados
-            this.pairedDevices = success;
-
             // Melhorar este bloco de código
-            this.pairedDevices.forEach(element => {
+            success.forEach(element => {
 
                 //Se já estiver pareado com o synesthesia, pega o address local e connecta automaticamente
                 if(element.name === "Synesthesia"){
@@ -128,7 +124,7 @@ export class BluetoothConnectionVerifyPage {
         },
         (err) => {
 
-        })
+        });
     }
 
     success = (data) => alert(data);
@@ -258,7 +254,7 @@ export class BluetoothConnectionVerifyPage {
         this.nativeStorage.setItem('bt_address', address).then(() => { 
             console.log('Stored item!')
         }, error => {
-                console.error('Error storing item', error)
+            console.error('Error storing item', error)
         });
     }
 
@@ -285,6 +281,7 @@ export class BluetoothConnectionVerifyPage {
             this.synesthesia();
         }, (fail) => {
             this.loadSound('assets/sounds/bluetooth_erro.ogg');
+            this.navCtrl.push(BluetoothConnectionVerifyPage);
         });
     }
 
@@ -329,12 +326,12 @@ export class BluetoothConnectionVerifyPage {
 		this.isPlaying  = false;
 		this.audioProvider.stopSound();
 	}
-
-	playSoundOscillator(){
-		this.audioProvider.playSoundOscillator();
-    }
     
     panner(track){
         this.audioProvider.panner(track);
+    }
+
+    soundTracker(){
+        this.navCtrl.push(SoundTrackerPage);
     }
 }

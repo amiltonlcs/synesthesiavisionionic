@@ -17,14 +17,14 @@
 	<!-- Button for scan disponible devices -->
 	<button ion-button block (click)="startScanning()">scan</button>
 	
-	<ion-list-header>
+	<!--<ion-list-header>
 		Paired Devices
-	</ion-list-header>
+	</ion-list-header>-->
 	
 	<!--List of the paired devices -->
-	<ion-item *ngFor="let device of pairedDevices">
+	<!--<ion-item *ngFor="let device of pairedDevices">
 		{{device.name}}
-	</ion-item>
+	</ion-item>-->
 	
 	<button ion-button block (click)="disconnect()">Disconnect</button>
 	
@@ -40,9 +40,11 @@
 	</ion-item>
 	
 
-	<button *ngFor="let track of tracks" ion-button block color="primary" (click)="loadSound(track.track)">
+	<!-- <button *ngFor="let track of tracks" ion-button block color="primary" (click)="loadSound(track.track)">
 		{{ track.artist}} - {{ track.name }}
-	</button>
+	</button> -->
 	<!-- <ion-spinner name="crescent" *ngIf="gettingDevices"></ion-spinner> -->
+
+	<button ion-button block (click)="soundTracker()">Go to sound Track</button>
 
 </ion-content>

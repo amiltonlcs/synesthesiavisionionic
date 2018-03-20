@@ -28,6 +28,7 @@ export class AudioProvider {
 	private volumeEsquerdo;
 	private volumeDireito;
 	private frequencia;
+	private isLoop: boolean;
 
 	constructor(public http: Http, private _LOADER: LoadingController) {
 		console.log('Hello AudioProvider Provider');

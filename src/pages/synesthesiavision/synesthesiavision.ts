@@ -67,6 +67,10 @@ export class SynesthesiavisionPage {
 			artist  : 'Time Synesthesia',
 		   	name    : 'Finalizar aplicativo',
 		   	track   : 'assets/sounds/finalizar.ogg'
+		}, {
+			artist  : 'Time Synesthesia',
+			name    : 'Sonorização dos sensores',
+			track   : 'assets/sounds/bu.ogg' 
 		}
 	];
 
@@ -78,35 +82,34 @@ export class SynesthesiavisionPage {
 				public audioProvider: AudioProvider) {
 
 		// Modificar futuramente para permitir a acessibilidade do usuário
-		if(mobileAccessibility.isScreenReaderRunning()){
+		// if(mobileAccessibility.isScreenReaderRunning()){
 
-			mobileAccessibility.speak("Reader está ativo");
-			console.log("O reader talkback está ativo");
-		} else{
+		// 	mobileAccessibility.speak("Reader está ativo");
+		// 	console.log("O reader talkback está ativo");
+		// } else{
 
-			mobileAccessibility.speak("Reader não está ativo");
-			console.log("O reader não está ativo");
-		}
+		// 	mobileAccessibility.speak("Reader não está ativo");
+		// 	console.log("O reader não está ativo");
+		// }
 	}
 
 	ionViewDidLoad() {
-		console.log('ionViewDidLoad SynesthesiavisionPage');
+		this.getBluetoothData();
 	}
 
 	toggleStatusButton(){
-		this.getBluetoothData();
 		if(this.init){
+
 			this.statusButton = 'PAUSAR';
+			this.init = false;
 
 			this.playSound();
-
-			this.init = false;
 		} else {
+
 			this.statusButton = 'INICIAR';
+			this.init = true;
 
 			this.stopSound();
-
-			this.init = true;
 		}
 	}
 
@@ -132,6 +135,7 @@ export class SynesthesiavisionPage {
 	//Implementar
 	createTimer(){
 
+		this.audioProvider.loadSound('assets/sounds/bu.ogg');
 		this.playAudio();
 		this.currentSensor++;
 		this.currentSensor %= 3;
@@ -185,6 +189,9 @@ export class SynesthesiavisionPage {
 	checkWeather(){
 
 		if(this.canGetWeather){
+
+			this.canGetWeather = false;
+
 			// Aciona o tts para avisar que a previsão do tempo foi acionada
 			this.ttsProvider.speak(this.startCheckWeather);
 
@@ -206,11 +213,16 @@ export class SynesthesiavisionPage {
 				
 							//Faz a verificação do tempo
 							this.weatherForecast.getWeather();
+
+							//Modificar, não vai funcionar direito já que a função de verificar o tempo é assíncrona
+							this.canGetWeather = true;
 						}, (err) => {
-				
+
+							this.canGetWeather = true;
 							console.log('Não foi possível localizar sua posição. ' + err.code + ' message: ' + err.message);
 						}). catch((err) => {
-				
+
+							this.canGetWeather = true;
 							console.log('Could not handle geolocation Promise.');
 						});
 
@@ -220,6 +232,7 @@ export class SynesthesiavisionPage {
 					});
 
 				} else {
+					this.canGetWeather = true;
 				}
 				
 			});
@@ -325,12 +338,12 @@ export class SynesthesiavisionPage {
 		this.bluetoothSerial.subscribe(this.DELIMITER).subscribe((data) => {
 			this.rx_buffer = data;
 
-			if(this.rx_buffer === "getweather"){
+			if(this.rx_buffer.includes('getweather')){
 				this.checkWeather();
 				return;
 			}
 
-			console.log(this.rx_buffer);
+			console.log('Resultado: ,' + this.rx_buffer + ',');
 			
 
 			let inx = this.rx_buffer.indexOf(this.DELIMITER);

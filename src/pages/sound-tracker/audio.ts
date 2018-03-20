@@ -13,7 +13,7 @@ declare var AudioContext: any;
 declare var	webkitAudioContext: any;
 
 @Injectable()
-export class AudioProvider {
+export class AudioProvider2 {
 
 	private _preloader : any;
 	private _track : any = null;
@@ -21,7 +21,8 @@ export class AudioProvider {
 	private _source : any;
 	private _context : any = new (AudioContext || webkitAudioContext)();
   private _gain : any = null;
-  private _variaveis: any = null;
+	private _variaveis: any = null;
+	
 	constructor(public http: Http, private _LOADER: LoadingController) {
 		console.log('Hello AudioProvider Provider');
 	}
@@ -40,7 +41,7 @@ export class AudioProvider {
   }
 	loadSound(){
 
-		this.displayPreloader('Loading track...');
+	
 
 		this.http.get(this._variaveis.track, { responseType: ResponseContentType.ArrayBuffer })
 			.map(res => res.arrayBuffer())
@@ -101,7 +102,7 @@ export class AudioProvider {
 		this._source.connect(this._gain);
 		this._gain.connect(this._context.destination);
     this._source.start(0,0,this._variaveis.sound_duration);
-		this.hidePreloader();
+	
 	}
 
 	playSound(track){
@@ -115,7 +116,7 @@ export class AudioProvider {
 		this._source.connect(this._gain);
 		this._gain.connect(this._context.destination);
     this._source.start(0);
-		this.hidePreloader();
+	
 	}
 }
 
