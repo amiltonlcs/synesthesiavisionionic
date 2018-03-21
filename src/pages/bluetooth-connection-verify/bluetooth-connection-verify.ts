@@ -23,6 +23,8 @@ import { SoundTrackerPage } from '../sound-tracker/sound-tracker';
 
 export class BluetoothConnectionVerifyPage {
 
+    private isEnabled: boolean = false;
+
     //Bluetooth Variables
 	unpairedDevices  : any;
     gettingDevices   : boolean;
@@ -65,7 +67,6 @@ export class BluetoothConnectionVerifyPage {
 	}
 
   	ionViewDidLoad() {
-        console.log('ionViewDidLoad BluetoothConnectionVerifyPage');
         this.loadSound('assets/sounds/synesthesia_sound.ogg');
   	}
 
@@ -84,7 +85,7 @@ export class BluetoothConnectionVerifyPage {
         this.createLoading();
         this.loading.present();
 
-        while(!this.bluetoothSerial.isEnabled()){
+        while(!this.isEnabled){
             this.checkEnabledBluetooth();
         }
 
@@ -121,9 +122,9 @@ export class BluetoothConnectionVerifyPage {
                     this.checkAddress();
                 }
             });
-        },
-        (err) => {
-
+        }, (err) => {
+            console.log('Error: ' + err);
+            
         });
     }
 
@@ -276,12 +277,12 @@ export class BluetoothConnectionVerifyPage {
      * @param address
      */
     autoConnect(address: string){
+        
         this.bluetoothSerial.connect(address).subscribe((success) => {
             this.loadSound('assets/sounds/bluetooth_confirma.ogg');
             this.synesthesia();
         }, (fail) => {
             this.loadSound('assets/sounds/bluetooth_erro.ogg');
-            this.navCtrl.push(BluetoothConnectionVerifyPage);
         });
     }
 
@@ -289,11 +290,22 @@ export class BluetoothConnectionVerifyPage {
      * Verify if the bluetooth is enable, if not, enable it
      * 
      * Melhorar este bloco de código
+     * 
+     * Ver como realizar chain of Promises
      */
     checkEnabledBluetooth(){
-        if(this.bluetoothSerial.isEnabled()){
-            this.bluetoothSerial.enable();
-        }
+
+        this.bluetoothSerial.isEnabled().then((ativado) => {
+            this.isEnabled = true;
+        }, (naoAtivado) => {
+            
+            //Pede ao usuário para habilitar o bluetooth
+            this.bluetoothSerial.enable().then((success) => {
+                this.isEnabled = true;
+            }, (err) => {
+                this.isEnabled = false;
+            });
+        });
     }
 
     /* Audio Methods

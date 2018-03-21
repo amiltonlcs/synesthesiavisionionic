@@ -20,4 +20,8 @@ export class BluetoothProvider {
 		return this.bluetoothSerial.subscribe('\n').subscribe();
 	}
 
+	connectToDevice(address: string){
+		return this.bluetoothSerial.connect(address);
+	}
+
 }

@@ -16,7 +16,6 @@ import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
-
 @IonicPage()
 @Component({
 	selector: 'page-synesthesiavision',
@@ -26,7 +25,7 @@ export class SynesthesiavisionPage {
 
 	// Variables
 	private statusButton      : string   = 'INICIAR';
-	private init              : boolean  = true;
+	private init              : boolean  = true; // True when is not playing, False when is playing
 	private frequencySound    : number   = 1;
 	private frequencySoundMs  : number   = 100;
 	private numberSensor      : number   = 3;

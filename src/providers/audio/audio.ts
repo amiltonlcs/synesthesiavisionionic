@@ -54,7 +54,7 @@ export class AudioProvider {
 
 	loadSound(track){
 
-		this.displayPreloader('Loading track...');
+		// this.displayPreloader('Loading track...');
 
 		this.http.get(track, { responseType: ResponseContentType.ArrayBuffer })
 			.map(res => res.arrayBuffer())
@@ -84,7 +84,7 @@ export class AudioProvider {
 		this._gain.connect(this._context.destination);
 
 		this._source.start(0);
-		this.hidePreloader();
+		// this.hidePreloader();
 	}
 
 	stopSound(){
@@ -130,7 +130,7 @@ export class AudioProvider {
 		this._gain.connect(this._context.destination);
 
 		this._source.start(0);
-		this.hidePreloader();
+		// this.hidePreloader();
 	}
 
 	test(track){
@@ -156,7 +156,7 @@ export class AudioProvider {
 		this._source.loop = false; // Som em loop?
 		this._source.playbackRate.value = 1.0; // Velocidade de reprodução do som
 		this._source.start(0); // Inicia a reprodução do som
-		this.hidePreloader();
+		// this.hidePreloader();
 	}
 
 
