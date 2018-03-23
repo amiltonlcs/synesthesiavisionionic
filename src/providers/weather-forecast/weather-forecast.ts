@@ -3,6 +3,8 @@ import { AlertController } from 'ionic-angular';
 import { TextToSpeech } from '@ionic-native/text-to-speech';
 import { HTTP } from '@ionic-native/http';
 import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
+import { Geoposition, Geolocation } from '@ionic-native/geolocation';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
 
 /*
   Generated class for the WeatherForecastProvider provider.
@@ -13,10 +15,18 @@ import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
 @Injectable()
 export class WeatherForecastProvider {
 
-	private latitude  : string;
-	private longitude : string;
+	private canGetWeather     : boolean  = true; // False when weather was previously solicited but hasn't been spoken
+	private latitude          : string;
+	private longitude         : string;
 
-	constructor(public http: HTTP, public alertCtrl: AlertController, public tts: TextToSpeech, public ttsProvider: TextToSpeechProvider) {
+	// TTS Strings
+	private startCheckWeather : string = 'Previsão do tempo acionada';
+	private gpsDeactived      : string = 'GPS desativado, impossível obter localização do usuário';
+	private alreadyRequesting : string = 'Processando previsão do tempo';
+
+	constructor(public http: HTTP, public alertCtrl: AlertController, public tts: TextToSpeech, 
+				public ttsProvider: TextToSpeechProvider, public locationAccuracy: LocationAccuracy,
+				public geolocation: Geolocation) {
 		console.log('Hello WeatherForecastProvider Provider');
 	}
 
@@ -49,11 +59,17 @@ export class WeatherForecastProvider {
 		this.http.setRequestTimeout(15);
 		this.http.get(url, {lat: this.latitude, lon: this.longitude, lang: Currentlang, units: unidade, appid: openWeatherAppKey}, {responseType: 'json'}).then((success) => {
 
+			// Transforma os dados recebidos em string JSON, para um objeto
 			resultado = JSON.parse(success.data);
 			
+			// Fala a previsão
 			this.ttsProvider.speak(resultado.weather[0].description + ' e temperatura de ' + resultado.main.temp + ' °C');
+			
+			//Disponibiliza para uma nova solicitação
+			this.canGetWeather = true;
 
-		}, (err) => {
+		}).catch((err)=> {
+			this.canGetWeather = true;
 
 			let alert = this.alertCtrl.create({
 				title: 'Erro',
@@ -64,4 +80,48 @@ export class WeatherForecastProvider {
 			alert.present();
 		});
 	}
+
+	verifyRequest(){
+		return this.locationAccuracy.canRequest();
+	}
+
+	// Pede ao usuário para ativar a localização do dispositivo (se não estiver acionada)
+	requestLocalization(canRequest: boolean){
+
+		if(canRequest){
+			this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY);
+		}
+	}
+
+	// Busca a localização atual do usuário
+	getUserPosition(){
+		return this.geolocation.getCurrentPosition();
+	}
+
+	startChecking(){
+
+		if(this.canGetWeather){
+
+			this.canGetWeather = false;
+			this.ttsProvider.speak(this.startCheckWeather);
+			
+			this.verifyRequest()
+				.then((canRequest: boolean) => {
+					return this.requestLocalization(canRequest);
+				})
+				.then(()=> {
+					return this.getUserPosition();		
+				})
+				.then((pos)=> {
+					this.setCoordinates((pos.coords.latitude).toString(), (pos.coords.longitude).toString());
+
+					return this.getWeather();
+				}).catch((err) => {
+					this.canGetWeather = true;
+				});
+		} else{
+			this.ttsProvider.speak(this.alreadyRequesting);
+		}
+	}
+	
 }
