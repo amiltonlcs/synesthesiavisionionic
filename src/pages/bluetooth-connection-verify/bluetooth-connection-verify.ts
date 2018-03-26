@@ -6,6 +6,7 @@ import { NativeStorage } from '@ionic-native/native-storage';
 import { PermissionProvider } from '../../providers/permission/permission';
 import { AudioProvider } from '../../providers/audio/audio';
 import { SoundTrackerPage } from '../sound-tracker/sound-tracker';
+import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
 
 
 /**
@@ -60,7 +61,8 @@ export class BluetoothConnectionVerifyPage {
         private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
         public navParams: NavParams, public alertCtrl: AlertController, 
         public loadingCtrl: LoadingController, public nativeStorage: NativeStorage,
-        public permissionsProvider: PermissionProvider, public audioProvider: AudioProvider) {
+        public permissionsProvider: PermissionProvider, public audioProvider: AudioProvider,
+        public bluetoothProvider: BluetoothProvider) {
         
         this.checkEnabledBluetooth();
         this.permissionsProvider.getPermissions();
@@ -288,24 +290,9 @@ export class BluetoothConnectionVerifyPage {
 
     /** 
      * Verify if the bluetooth is enable, if not, enable it
-     * 
-     * Melhorar este bloco de código
-     * 
-     * Ver como realizar chain of Promises
      */
     checkEnabledBluetooth(){
-
-        this.bluetoothSerial.isEnabled().then((ativado) => {
-            this.isEnabled = true;
-        }, (naoAtivado) => {
-            
-            //Pede ao usuário para habilitar o bluetooth
-            this.bluetoothSerial.enable().then((success) => {
-                this.isEnabled = true;
-            }, (err) => {
-                this.isEnabled = false;
-            });
-        });
+        this.isEnabled = this.bluetoothProvider.checkEnabledBluetooth();
     }
 
     /* Audio Methods
@@ -339,10 +326,6 @@ export class BluetoothConnectionVerifyPage {
 		this.audioProvider.stopSound();
 	}
     
-    panner(track){
-        this.audioProvider.panner(track);
-    }
-
     soundTracker(){
         this.navCtrl.push(SoundTrackerPage);
     }

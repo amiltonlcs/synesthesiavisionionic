@@ -9,6 +9,7 @@ import { Vibration } from '@ionic-native/vibration';
 import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
 import { AudioProvider } from '../../providers/audio/audio';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
+import { AudioProvider2 } from '../sound-tracker/audio';
 
 /**
  * Generated class for the SynesthesiavisionPage page.
@@ -31,8 +32,8 @@ export class SynesthesiavisionPage {
 	private numberSensor      : number   = 3;
 	private currentSensor     : number   = 0;
 	private distanceSensor    : number[] = [this.numberSensor];
-	private canGetWeather     : boolean  = true; // False when weather was previously solicited but hasn't been spoken
 	private rx_buffer         : string;
+	private intervalo         : any; // To execute the sound in loop
 
 	// Vibration Patterns
 	private patternOn         : number[] = [200, 200, 200, 200, 200]; // Vibrates 3 times
@@ -52,9 +53,9 @@ export class SynesthesiavisionPage {
 	private downFrequency     : string = 'Diminuindo frequência';
 	private maxLimitRange     : string = 'Frequência máxima atingida';
 	private minLimitRange     : string = 'Frequência mínima atingida';
-	private startCheckWeather : string = 'Previsão do tempo acionada';
-	private gpsDeactived      : string = 'GPS desativado, impossível obter localização do usuário';
-	private alreadyRequesting : string = 'Processando previsão do tempo';
+
+	//Modificar
+	variaveis: any = { side: Number, sound_duration: Number, track: String, frequencia: Number };
 
 	public tracks: any = [
 		{
@@ -74,11 +75,11 @@ export class SynesthesiavisionPage {
 	];
 
 	constructor(public navCtrl: NavController, public navParams: NavParams, 
-				public mobileAccessibility: MobileAccessibility, public weatherForecast: WeatherForecastProvider,
+				public mobileAccessibility: MobileAccessibility, public weatherForecastProvider: WeatherForecastProvider,
 				public geolocation: Geolocation, public locationAccuracy: LocationAccuracy,
 				public ttsProvider: TextToSpeechProvider, public vibrator: Vibration,
 				public bluetoothProvider: BluetoothProvider, public bluetoothSerial: BluetoothSerial,
-				public audioProvider: AudioProvider) {
+				public audioProvider: AudioProvider, public audioProvider2: AudioProvider2) {
 
 		// Modificar futuramente para permitir a acessibilidade do usuário
 		// if(mobileAccessibility.isScreenReaderRunning()){
@@ -90,6 +91,11 @@ export class SynesthesiavisionPage {
 		// 	mobileAccessibility.speak("Reader não está ativo");
 		// 	console.log("O reader não está ativo");
 		// }
+
+		this.variaveis.side = 1;
+		this.variaveis.sound_duration = 0.8;
+		this.variaveis.track = 'assets/sounds/bu.ogg';
+		this.variaveis.frequencia = 1;
 	}
 
 	ionViewDidLoad() {
@@ -127,14 +133,14 @@ export class SynesthesiavisionPage {
 
 	stopSound(){
 		this.ttsProvider.speak(this.pauseSonorization);
-
+		this.stopTimer();
 		this.vibrator.vibrate(this.patternOff);
 	}
 
 	//Implementar
 	createTimer(){
 
-		this.audioProvider.loadSound('assets/sounds/bu.ogg');
+		// this.audioProvider.loadSound('assets/sounds/bu.ogg');
 		this.playAudio();
 		this.currentSensor++;
 		this.currentSensor %= 3;
@@ -142,108 +148,26 @@ export class SynesthesiavisionPage {
 
 	// Implementar
 	stopTimer(){
-
+		clearInterval(this.intervalo);
 	}
 
 	playAudio(){
-		let volume: number  = 1;
-		let frequency: number = 0.01;
 
-        let values: number[] = [2];
-        values = this.getMinDistance(values);
-        let distance: number = values[0];
-        let sensor: number = values[1];
-
-        console.log("Min Distance: " + distance);
-
-        if (distance < this.DMAX) {
-            frequency = (this.DMIN * 2) / distance;
-        } else {
-            volume = 0.01;
-        }
-
-		this.audioProvider.setRate(frequency); //Set the specified frequency.
-
-		//Left Sensor
-		switch (sensor) {
-
-			case 0: //right
-				console.log("Right");
-				this.audioProvider.setVolume(0, volume);
-				break;
-
-			case 1: //front
-				console.log("Front");
-				this.audioProvider.setVolume((3 * volume / 4), (3 * volume / 4));
-				break;
-
-			case 2: //left
-
-				console.log("Left");
-				this.audioProvider.setVolume(volume, 0);  //Set the volume according to the sensor passed to function.
-				break;
-		}
+		this.intervalo = setInterval(() => {
+			this.audioProvider2.atualizarSensor(this.distanceSensor, this.variaveis);
+		}, 1500);
 	}
 
+	/**
+	 * Uses the weatherForecastProvider to verify the user's Position 
+	 * and it's weather.
+	 */
 	checkWeather(){
-
-		if(this.canGetWeather){
-
-			this.canGetWeather = false;
-
-			// Aciona o tts para avisar que a previsão do tempo foi acionada
-			this.ttsProvider.speak(this.startCheckWeather);
-
-			//Verifica se é possível pegar a localização do usuário
-			this.locationAccuracy.canRequest().then((canRequest: boolean) => {
-
-				if(canRequest) {
-
-					//Pede ao usuário para ativar a localização do dispositivo (se não estiver acionada)
-					this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY).then((success) => {
-						
-						// Busca a localização atual do usuário
-						this.geolocation.getCurrentPosition().then((result) => {
-							let lat = result.coords.latitude;
-							let long = result.coords.longitude;
-							
-							// Utiliza o provider para settar as coordenadas
-							this.weatherForecast.setCoordinates(lat.toString(), long.toString());
-				
-							//Faz a verificação do tempo
-							this.weatherForecast.getWeather();
-
-							//Modificar, não vai funcionar direito já que a função de verificar o tempo é assíncrona
-							this.canGetWeather = true;
-						}, (err) => {
-
-							this.canGetWeather = true;
-							console.log('Não foi possível localizar sua posição. ' + err.code + ' message: ' + err.message);
-						}). catch((err) => {
-
-							this.canGetWeather = true;
-							console.log('Could not handle geolocation Promise.');
-						});
-
-					}, (error) => {
-						this.ttsProvider.speak(this.gpsDeactived);
-						console.log('Error requesting location permissions', error);
-					});
-
-				} else {
-					this.canGetWeather = true;
-				}
-				
-			});
-		} else {
-			this.ttsProvider.speak(this.alreadyRequesting);
-		}
-
-		//verificar se o usuário tem acesso a internet
+		this.weatherForecastProvider.startChecking();
 	}
 
 	increaseFrequency(){
-
+		// this.audioProvider2.atualizarSensor(this.distanceSensor, this.variaveis);
 		if(this.frequencySound < this.MAX){
 
 			this.frequencySound += 1;
@@ -326,7 +250,13 @@ export class SynesthesiavisionPage {
             else if (sensor == 'c') {
                 this.distanceSensor[0] = distance;
             }
-        }
+		}
+
+
+		// setTimeout(() => {
+		// 	this.audioProvider2.atualizarSensor(this.distanceSensor, this.variaveis);
+		// }, 1000);
+		
 	}
 	
 	/**
@@ -363,8 +293,9 @@ export class SynesthesiavisionPage {
 			let sensor = sensor1.charAt(0);
 	
 			//If have any data, it will save.
-			if( typeof sensor === "string" && typeof distance.charAt(0) === "string") {
-				if (this.isEmpty(distance) && distance.search("DISCONNECTED") == -1) {
+			//Modificar 
+			if(typeof sensor === "string" && typeof distance.charAt(0) === "string") {
+				if (!this.isEmpty(distance) && distance.search("DISCONNECTED") == -1) {
 					this.saveData(sensor, Number(distance));
 				}
 			}
@@ -374,11 +305,17 @@ export class SynesthesiavisionPage {
 		
 	}
 
+	/**
+	 * Implementation of method isEmpty. Receives a string data and verify it's length
+	 * if it's equals 0 returns true otherwise, returns false;
+	 * 
+	 * @param data String to check it's length
+	 */
 	private isEmpty(data: string): boolean{
 		if(data.length == 0){
-			return false;
-		} else {
 			return true;
+		} else {
+			return false;
 		}
 	}
 
