@@ -23,6 +23,7 @@ export class WeatherForecastProvider {
 	private startCheckWeather : string = 'Previsão do tempo acionada';
 	private gpsDeactived      : string = 'GPS desativado, impossível obter localização do usuário';
 	private alreadyRequesting : string = 'Processando previsão do tempo';
+	private cantGetWeather    : string = 'Não foi possível acessar a previsão do tempo';
 
 	constructor(public http: HTTP, public alertCtrl: AlertController, public tts: TextToSpeech, 
 				public ttsProvider: TextToSpeechProvider, public locationAccuracy: LocationAccuracy,
@@ -89,7 +90,7 @@ export class WeatherForecastProvider {
 	requestLocalization(canRequest: boolean){
 
 		if(canRequest){
-			this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY);
+			return this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY);
 		}
 	}
 
@@ -118,6 +119,7 @@ export class WeatherForecastProvider {
 					return this.getWeather();
 				}).catch((err) => {
 					this.canGetWeather = true;
+					this.ttsProvider.speak(this.cantGetWeather);
 				});
 		} else{
 			this.ttsProvider.speak(this.alreadyRequesting);

@@ -7,6 +7,7 @@ import { PermissionProvider } from '../../providers/permission/permission';
 import { AudioProvider } from '../../providers/audio/audio';
 import { SoundTrackerPage } from '../sound-tracker/sound-tracker';
 import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
+import { TextToSpeechProvider } from '../../providers/text-to-speech/text-to-speech';
 
 
 /**
@@ -62,7 +63,7 @@ export class BluetoothConnectionVerifyPage {
         public navParams: NavParams, public alertCtrl: AlertController, 
         public loadingCtrl: LoadingController, public nativeStorage: NativeStorage,
         public permissionsProvider: PermissionProvider, public audioProvider: AudioProvider,
-        public bluetoothProvider: BluetoothProvider) {
+        public bluetoothProvider: BluetoothProvider, public ttsProvider: TextToSpeechProvider) {
         
         this.checkEnabledBluetooth();
         this.permissionsProvider.getPermissions();
@@ -102,8 +103,7 @@ export class BluetoothConnectionVerifyPage {
             this.loading.dismiss();
 
             //this.synesthesia();
-        },
-        (err) => {
+        }).catch((err) => {
             console.log('Deu ERRO: ' + err);
 
             //Deixa de exibir o loading spinner
@@ -124,9 +124,9 @@ export class BluetoothConnectionVerifyPage {
                     this.checkAddress();
                 }
             });
-        }, (err) => {
-            console.log('Error: ' + err);
+        }).catch((err) => {
             
+            console.log('Error: ' + err);
         });
     }
 
@@ -160,20 +160,26 @@ export class BluetoothConnectionVerifyPage {
                     text: 'Connect',
 
                     handler: () => {
-                        this.bluetoothSerial.connect(device.address).subscribe((success)=> {
 
-                            if(device.name === 'Synesthesia'){
+                        if(device.name === 'Synesthesia'){
 
+                            this.bluetoothSerial.connect(device.address).subscribe((success)=> {
+    
                                 this.loadSound('assets/sounds/bluetooth_confirma.ogg');
                                 this.saveAddress(device.address);
     
                                 //Após conectar direcionar para a página principal do synesthesia
                                 this.synesthesia();
-                            }
-                            
-                        }, (error) => {
-                            console.log(error);
-                        });
+                                
+                            }, (error) => {
+                                console.log(error);
+                            });
+
+                        } else{
+
+                            this.ttsProvider.speak('Não é possível conectar, não é um dispositivo Synesthesia');
+                        }
+
                     }
                 }
             ]

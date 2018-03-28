@@ -5,6 +5,7 @@ import { NativeStorage } from '@ionic-native/native-storage';
 import { AudioProvider } from '../audio/audio';
 import { NavController } from 'ionic-angular';
 import { SynesthesiavisionPage } from '../../pages/synesthesiavision/synesthesiavision';
+import { WeatherForecastProvider } from '../weather-forecast/weather-forecast';
 
 /*
   Generated class for the BluetoothProvider provider.
@@ -15,7 +16,16 @@ import { SynesthesiavisionPage } from '../../pages/synesthesiavision/synesthesia
 @Injectable()
 export class BluetoothProvider {
 
+	// Variables
 	private isEnabled: boolean = false;
+	private rx_buffer         : string;
+	private numberSensor      : number   = 3;
+	private distanceSensor    : number[] = [this.numberSensor];
+
+	// Delimiters
+	private DELIMITER         : string = '\n';
+	private DMAX              : number = 150;
+	private DMIN              : number = 30;
 	
 	//Sound Variables
     public volume: any = 50;
@@ -44,7 +54,8 @@ export class BluetoothProvider {
 	];
 
 	constructor(public http: HttpClient, public bluetoothSerial: BluetoothSerial,
-				public nativeStorage: NativeStorage, public audioProvider: AudioProvider) {
+				public nativeStorage: NativeStorage, public audioProvider: AudioProvider,
+				public weatherForecastProvider: WeatherForecastProvider) {
 		console.log('Hello BluetoothProvider Provider');
 	}
 
@@ -97,7 +108,77 @@ export class BluetoothProvider {
 
 	synesthesia(){
         // this.navCtrl.push(SynesthesiavisionPage);
-    }
+	}
+
+	getDistanceSensor(): number[]{
+		return this.distanceSensor;
+	}
+
+	/**
+     * Saves a distance which comes from the glass.
+     *
+     * @param sensor   The sensor which value will be saved.
+     * @param distance Save specified sensors distance.
+     */
+    public saveData(sensor: string, distance: number) {
+
+        if(distance < this.DMAX) {
+            if (sensor == 'a') {
+                this.distanceSensor[2] = distance;
+            }
+            //Front
+            else if (sensor == 'b') {
+                this.distanceSensor[1] = distance;
+            }
+            //Left
+            else if (sensor == 'c') {
+                this.distanceSensor[0] = distance;
+            }
+		}
+	}
+	
+	getBluetoothData(): any{
+
+		let dados: any = { nomeSensor: Number, distance: Number};
+
+		return this.bluetoothSerial.subscribe(this.DELIMITER).subscribe((data) => {
+			this.rx_buffer = data;
+
+			if(this.rx_buffer.includes('getweather')){
+				this.weatherForecastProvider.startChecking();
+			}
+
+			console.log('Resultado: ,' + this.rx_buffer + ',');
+			
+
+			let inx = this.rx_buffer.indexOf(this.DELIMITER);
+	
+			//Get the first character responsable for indentifier the sensor
+			let sensor1 = this.rx_buffer.substring(0, 1);
+			
+			//Get the distance after character
+			let distance = "";
+			
+			try{
+				distance = this.rx_buffer.substring(1, inx);
+			} catch(err) {
+				console.log('Error: ' + err);
+			}
+			
+			//Get the primary character at message, which corresponds to sensor which has sent the distance
+			let sensor = sensor1.charAt(0);
+	
+			//If have any data, it will save.
+			//Modificar 
+			if(typeof sensor === "string" && typeof distance.charAt(0) === "string") {
+				if (!this.isEmpty(distance) && distance.search("DISCONNECTED") == -1) {
+					this.saveData(sensor, Number(distance));
+				}
+			}
+		}, (err) => {
+
+		});
+	}
 
     /** 
      * Verify if the bluetooth is enable, if not, enable it
@@ -138,5 +219,19 @@ export class BluetoothProvider {
 	stopPlayback(){
 		this.isPlaying  = false;
 		this.audioProvider.stopSound();
+	}
+
+	/**
+	 * Implementation of method isEmpty. Receives a string data and verify it's length
+	 * if it's equals 0 returns true otherwise, returns false;
+	 * 
+	 * @param data String to check it's length
+	 */
+	private isEmpty(data: string): boolean{
+		if(data.length == 0){
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
