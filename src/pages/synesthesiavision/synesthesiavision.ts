@@ -10,6 +10,7 @@ import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
 import { AudioProvider } from '../../providers/audio/audio';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { AudioProvider2 } from '../sound-tracker/audio';
+import { BusIntegrationProvider } from '../../providers/bus-integration/bus-integration';
 
 /**
  * Generated class for the SynesthesiavisionPage page.
@@ -25,26 +26,23 @@ import { AudioProvider2 } from '../sound-tracker/audio';
 export class SynesthesiavisionPage {
 
 	// Variables
-	private statusButton      : string   = 'INICIAR';
+	public statusButton       : string   = 'INICIAR';
 	private init              : boolean  = true; // True when is not playing, False when is playing
 	private frequencySound    : number   = 1;
 	private frequencySoundMs  : number   = 100;
 	private numberSensor      : number   = 3;
 	private currentSensor     : number   = 0;
 	private distanceSensor    : number[] = [this.numberSensor];
-	private rx_buffer         : string;
 	private intervalo         : any; // To execute the sound in loop
+	private volume			  : number = 50;
 
 	// Vibration Patterns
 	private patternOn         : number[] = [200, 200, 200, 200, 200]; // Vibrates 3 times
 	private patternOff        : number[] = [200, 200, 200]; // Vibrates 2 times
 
 	// Delimiters
-    private DELIMITER         : string = '\n';
 	private MAX               : number = 5; // Maximun frequency for frequencySound
 	private MIN               : number = 1; // Minimun frequency for frequencySound
-	private DMIN              : number = 30;
-	private DMAX              : number = 150;
 
 	// TTS Strings
 	private startSonorization : string = 'Iniciando sonorização';
@@ -79,7 +77,8 @@ export class SynesthesiavisionPage {
 				public geolocation: Geolocation, public locationAccuracy: LocationAccuracy,
 				public ttsProvider: TextToSpeechProvider, public vibrator: Vibration,
 				public bluetoothProvider: BluetoothProvider, public bluetoothSerial: BluetoothSerial,
-				public audioProvider: AudioProvider, public audioProvider2: AudioProvider2) {
+				public audioProvider: AudioProvider, public audioProvider2: AudioProvider2,
+				public busIntegration : BusIntegrationProvider) {
 
 		// Modificar futuramente para permitir a acessibilidade do usuário
 		// if(mobileAccessibility.isScreenReaderRunning()){
@@ -148,16 +147,45 @@ export class SynesthesiavisionPage {
 
 	// Implementar
 	stopTimer(){
-		clearInterval(this.intervalo);
+		this.audioProvider2.stopRunningSound();
 	}
 
 	playAudio(){
 
-		this.intervalo = setInterval(() => {
-			this.audioProvider2.atualizarSensor(this.distanceSensor, this.variaveis);
-		}, 1500);
-	}
+		this.audioProvider2.playSound();
 
+		// this.intervalo = setInterval(() => {
+
+		// 	// Como o método de salvar a distancia do sensor saiu da classe do synesthesiavision
+		// 	// É necessário atualizar o distanceSensor antes de executar o som.
+		// 	this.distanceSensor = this.bluetoothProvider.getDistanceSensor();
+
+		// 	this.audioProvider2.atualizarSensor(this.distanceSensor, this.variaveis);
+		// }, this.calcularFrequencia(this.getDistanceMin()));
+	}
+	
+	calcularFrequencia(distancia) {
+		
+		var frequencia;
+		var frequencia_MIN = 1300;
+		var frequencia_MAX = 4000;
+		var distancia_MIN = 30;
+	
+		if (distancia >= distancia_MIN) {
+				frequencia = distancia * 18;
+		} else {
+				frequencia = frequencia_MIN;
+		}
+	
+		if (frequencia > frequencia_MAX) {
+				frequencia = frequencia_MAX;
+		}
+	
+		console.log("frequencia atual: " + frequencia)
+		return frequencia;
+	}
+	
+	
 	/**
 	 * Uses the weatherForecastProvider to verify the user's Position 
 	 * and it's weather.
@@ -204,119 +232,266 @@ export class SynesthesiavisionPage {
 		}
 	}
 
-	private getMinDistance(input: number[]): number[] {
+	// private getDistanceMin(){
+	// 	if (this.distanceSensor[0] < this.distanceSensor[1] && this.distanceSensor[0] < this.distanceSensor[2]) {
 
-        if(this.distanceSensor[0] < this.distanceSensor[1]) {
+	// 		return this.distanceSensor[0];
 
-            if (this.distanceSensor[0] < this.distanceSensor[2]) {
+	// 	} else if (this.distanceSensor[1] < this.distanceSensor[0] && this.distanceSensor[1] < this.distanceSensor[2]) {
+
+	// 		return this.distanceSensor[1];
+
+	// 	} else if (this.distanceSensor[2] < this.distanceSensor[0] && this.distanceSensor[2] < this.distanceSensor[1]) {
+
+	// 		return this.distanceSensor[2];
+	// 	}
+	// }
+	// private getMinDistance(input: number[]): number[] {
+
+    //     if(this.distanceSensor[0] < this.distanceSensor[1]) {
+
+    //         if (this.distanceSensor[0] < this.distanceSensor[2]) {
 				
-				input[0] = this.distanceSensor[0];
-                input[1] = 0;
-            } else{
+	// 			input[0] = this.distanceSensor[0];
+    //             input[1] = 0;
+    //         } else{
 				
-				input[0] = this.distanceSensor[2];
-                input[1] = 2;
-            }
-        } else if (this.distanceSensor[1] < this.distanceSensor[2]) {
+	// 			input[0] = this.distanceSensor[2];
+    //             input[1] = 2;
+    //         }
+    //     } else if (this.distanceSensor[1] < this.distanceSensor[2]) {
 			
-			input[0] = this.distanceSensor[1];
-            input[1] = 1;
-        } else {
+	// 		input[0] = this.distanceSensor[1];
+    //         input[1] = 1;
+    //     } else {
 			
-			input[0] = this.distanceSensor[2];
-            input[1] = 2;
-		}
+	// 		input[0] = this.distanceSensor[2];
+    //         input[1] = 2;
+	// 	}
 		
-        return input;
-	}
-	
-	/**
-     * Saves a distance which comes from the glass.
-     *
-     * @param sensor   The sensor which value will be saved.
-     * @param distance Save specified sensors distance.
-     */
-    private saveData(sensor: string, distance: number) {
-
-        if(distance < this.DMAX) {
-            if (sensor == 'a') {
-                this.distanceSensor[2] = distance;
-            }
-            //Front
-            else if (sensor == 'b') {
-                this.distanceSensor[1] = distance;
-            }
-            //Left
-            else if (sensor == 'c') {
-                this.distanceSensor[0] = distance;
-            }
-		}
-
-
-		// setTimeout(() => {
-		// 	this.audioProvider2.atualizarSensor(this.distanceSensor, this.variaveis);
-		// }, 1000);
-		
-	}
+    //     return input;
+	// }
 	
 	/**
      * Handle the data which comes through Bluetooth socket.
      */
 	private getBluetoothData(){
+		this.bluetoothProvider.getBluetoothData();
+	}
+
+	increaseVolume(){
 		
-		this.bluetoothSerial.subscribe(this.DELIMITER).subscribe((data) => {
-			this.rx_buffer = data;
+		if(this.volume < 100){
+			this.volume+=10;
+			this.audioProvider2.changeVolume(this.volume);
+		}
+		
+		console.log(this.volume);	
+	}
 
-			if(this.rx_buffer.includes('getweather')){
-				this.checkWeather();
-				return;
-			}
+	descreaseVolume(){
 
-			console.log('Resultado: ,' + this.rx_buffer + ',');
-			
+		if(this.volume > 0){
+			this.volume-=10;
+			this.audioProvider2.changeVolume(this.volume);
+		}
 
-			let inx = this.rx_buffer.indexOf(this.DELIMITER);
+		console.log(this.volume);
+	}
+
+	muteVolume(){
+
+		this.volume = 0;
+		this.audioProvider2.changeVolume(0);
+	}
+
+
+
+
+
+	getParadas(){
 	
-			//Get the first character responsable for indentifier the sensor
-			let sensor1 = this.rx_buffer.substring(0, 1);
-			
-			//Get the distance after character
-			let distance = "";
-			
-			try{
-				distance = this.rx_buffer.substring(1, inx);
-			} catch(err) {
-				console.log('Error: ' + err);
-			}
-			
-			//Get the primary character at message, which corresponds to sensor which has sent the distance
-			let sensor = sensor1.charAt(0);
+		
 	
-			//If have any data, it will save.
-			//Modificar 
-			if(typeof sensor === "string" && typeof distance.charAt(0) === "string") {
-				if (!this.isEmpty(distance) && distance.search("DISCONNECTED") == -1) {
-					this.saveData(sensor, Number(distance));
-				}
-			}
-		}, (err) => {
+		return this.busIntegration.startChecking().then((paradas) => {
 
 		});
+	}
+
+	getLinhas(){
+		this.busIntegration.getLinhas();
+	}
+
+	getEstruturaLinha(){
+
+		// Etiqueta da linha BARRO / MACAXEIRA (BR-101)
+		// Id é 447
+		let etiquetaLinha: string = '207';
+
+		this.busIntegration.getEstruturaLinha(etiquetaLinha);
+	}
+
+	// Obs.: Não retorna nada
+	getVeiculosLinha(){
+
+		// Etiqueta da linha BARRO / MACAXEIRA (BR-101)
+		// Id é 447
+		let etiquetaLinha: string = '207';
+
+		this.busIntegration.getVeiculosLinha(etiquetaLinha);
+	}
+
+	getLinhasParada(){
+
+		// Etiqueta da parada na frente no IFPE
+		let etiquetaEstacao: string = '80307';
+
+		this.busIntegration.getLinhasParada(etiquetaEstacao);
+	}
+
+	getParadasZona(){
+		this.busIntegration.getParadasZona();
+	}
+
+	getHorarioParadaLinha(){
+
+		// Etiqueta da parada na frente no IFPE
+		let etiquetaEstacao: string = '80307';
 		
+		// Etiqueta da linha TI TANCREDO NEVES / TI MACAXEIRA
+		let etiquetaLinha: string = '060';
+
+		this.busIntegration.getHorarioParadaLinha(etiquetaEstacao, etiquetaLinha);
 	}
 
-	/**
-	 * Implementation of method isEmpty. Receives a string data and verify it's length
-	 * if it's equals 0 returns true otherwise, returns false;
-	 * 
-	 * @param data String to check it's length
-	 */
-	private isEmpty(data: string): boolean{
-		if(data.length == 0){
-			return true;
-		} else {
-			return false;
+	getEstimacao(){
+
+		// Etiqueta da parada na frente no IFPE
+		let etiquetaEstacao: string = '80307';
+
+		this.busIntegration.getEstimacao(etiquetaEstacao);
+	}
+
+	// Requisição está errada
+	getTempoPercurso(){
+		
+		// Etiqueta da parada na frente no IFPE
+		let etiquetaEstacao: string = '80307';
+
+		//Erro: não utilizar esta etiqueta
+		// Etiqueta da linha TI TANCREDO NEVES / TI MACAXEIRA
+		let etiquetaEstacaoFim: string = '060';
+		
+		this.busIntegration.getTempoPercurso(etiquetaEstacao, etiquetaEstacaoFim);
+	}
+
+	// Obs.: Não retorna nada
+	getMensagensParada(){
+		
+		// Etiqueta da parada na frente no IFPE
+		let etiquetaEstacao: string = '80307';
+
+		this.busIntegration.getMensagensParada(etiquetaEstacao);
+	}
+
+	getParadaProxima(){
+
+		let menorLocalizacao;
+		let valores: any[];
+
+		this.ttsProvider.speak('Verificando ônibus da parada mais próxima.');
+
+		this.busIntegration.startChecking().then((etiquetasParadas) => {
+			
+			//Criado um objeto que recebe um nome e é associado ao tipo ParadasRequest (Array de String)
+			let etiquetasParadasArray: { [params: string]: string[]; } = {};
+			etiquetasParadasArray['params'] = etiquetasParadas; // Adiciona os dados necessários
+
+			return this.busIntegration.getParadasPorLabel(etiquetasParadasArray);
+		}).then((paradasEncontradas) => {
+			return this.busIntegration.calculaMenorCoordenada(paradasEncontradas);
+		}).then((menorPosicao: any) => {
+			return this.busIntegration.getEstimacao(menorPosicao.Label);
+		}).then((vehicleEstimationList: any) => {
+
+			if(vehicleEstimationList.length < 5){
+
+				for(let i = 0; i < vehicleEstimationList.length; i++){
+
+					let arrival = this.transformTime(vehicleEstimationList[i].arrivalTime);
+			
+					let frase = 'Ônibus linha' + vehicleEstimationList[i].line + ', chegando em ' + arrival + '.'
+	
+					setTimeout(() => {
+								
+						this.ttsProvider.speak(frase).then((success) => {
+		
+						});
+					}, 2200);
+				}
+			}
+
+			for(let i = 0; i < 5; i++){
+
+				let arrival = this.transformTime(vehicleEstimationList[i].arrivalTime);
+		
+				let frase = 'Ônibus linha' + vehicleEstimationList[i].line + ', chegando em ' + arrival + '.'
+
+				this.ttsProvider.speak(frase).then((success) => {
+					setTimeout(() => {
+								
+					}, 1200);
+
+				});
+			}
+		}).catch((err) => {
+			this.ttsProvider.speak('Ocorreu algum erro ao veriricar a linha.');
+		});
+
+	}
+
+	transformTime(value: string) {
+
+		let dataFiltrada = '';
+
+		let actualDate = new Date();
+		let miliseconds = value.slice(6, 19);
+
+		let result = Number(miliseconds) - actualDate.getTime();
+		let resultDate = new Date(result);
+
+		var h = resultDate.getUTCHours();
+		var m = resultDate.getUTCMinutes();
+		var s = resultDate.getUTCSeconds();
+
+		if(h !== 0){
+
+			if(h > 1){
+				dataFiltrada = h + ' horas ';
+			} else{
+				dataFiltrada = h + ' hora ';
+			}
 		}
-	}
 
+		if(m !== 0){
+			if(m > 1){
+
+				dataFiltrada = dataFiltrada + m + ' minutos ';
+			} else{
+				dataFiltrada = dataFiltrada+ m + ' minuto ';
+			}
+		}
+
+		if(s !== 0){
+			if(s > 1){
+
+				dataFiltrada = dataFiltrada + ' e ' + s + ' segundos';
+			} else{
+				dataFiltrada = dataFiltrada + ' e ' + s + ' segundo';
+			}
+		}
+
+		return dataFiltrada;
+	}
+	
 }

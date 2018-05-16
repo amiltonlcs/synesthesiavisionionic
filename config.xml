@@ -95,4 +95,7 @@
     <plugin name="cordova-plugin-vibration" spec="^3.0.1" />
     <engine name="android" spec="~7.0.0" />
     <engine name="browser" spec="~5.0.3" />
+    <allow-navigation href="http://10.0.0.20:8100" />
+    <allow-navigation href="http://10.200.0.46:8100" />
+    <allow-navigation href="http://192.168.137.1:8100" />
 </widget>

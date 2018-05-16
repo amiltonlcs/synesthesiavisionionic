@@ -2,6 +2,7 @@ import { Http, ResponseContentType } from '@angular/http';
 import { Injectable } from '@angular/core';
 import { LoadingController } from 'ionic-angular';
 import 'rxjs/add/operator/map';
+import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
 
 /*
   Generated class for the AudioProvider provider.
@@ -22,11 +23,23 @@ export class AudioProvider2 {
 	private _context: any = new (AudioContext || webkitAudioContext)();
 	private _gain: any = null;
 	private _variaveis: any = null;
-	private sensor: number[] = [130, 90, 190];// REMOVER POSTERIORMENTE OU SETAR INICIO COMO 0,0,0 PARA NAO EMITIR RUIDO NO PRIMEIRO CICLO.
-	private sensibilidade: number = 140;//sENSIBILIDADE DO SENSOR COM RELAÇÃO AO SEU LIMITE
+	private sensor: number[] = [0,0,0]; // REMOVER POSTERIORMENTE OU SETAR INICIO COMO 0,0,0 PARA NAO EMITIR RUIDO NO PRIMEIRO CICLO.
+	private sensibilidade: number = 140; //SENSIBILIDADE DO SENSOR COM RELAÇÃO AO SEU LIMITE
 
-	constructor(public http: Http, private _LOADER: LoadingController) {
+	//
+	private numberSensor      : number   = 3;
+	private distanceSensor    : number[] = [this.numberSensor];
+	private intervalo         : any; // To execute the sound in loop//Modificar
+	
+	private variaveis: any = { side: Number, sound_duration: Number, track: String, frequencia: Number };
+
+	constructor(public http: Http, private _LOADER: LoadingController, public bluetoothProvider: BluetoothProvider) {
 		console.log('Hello AudioProvider Provider');
+
+		this.variaveis.side = 1;
+		this.variaveis.sound_duration = 0.8;
+		this.variaveis.track = 'assets/sounds/bu.ogg';
+		this.variaveis.frequencia = 1;
 	}
 
 	playSoundOscillator() {
@@ -37,6 +50,7 @@ export class AudioProvider2 {
 		osc.start(); // start the oscillator
 		osc.stop(this._context.currentTime + 2); // stop 2 seconds after the current time
 	}
+
 	startSound(variaveis: any) {
 		this._variaveis = variaveis;
 		this.loadSound();
@@ -56,7 +70,7 @@ export class AudioProvider2 {
 			this._audio = buffer;
 			this._track = this._audio;
 
-			this.panner(this._track);
+			this.playAudioTrack(this._track);
 		});
 	}
 
@@ -88,36 +102,48 @@ export class AudioProvider2 {
 		// so we're using a fraction of the supplied value to
 		// handle this situation
 		console.log('Volume: ' + percentile);
-		this._gain.gain.value = percentile * percentile;
+		this._gain.value = percentile;
 	}
 
-	panner(track) {
+	playAudioTrack(track) {
 
 		this._gain = this._context.createStereoPanner();
 
 		this._source = this._context.createBufferSource();
 		this._source.buffer = track;
-		console.log(this._variaveis.side);
-
 		let side = this.defineSoundWebApi();
+		console.log(side)
+			//TESTAR AINDA
+			// if(side = 2){
+			// 	this._gain.pan.setValueAtTime(side, 0);
+			// 	this._source.connect(this._gain);
+			// 	this._gain.connect(this._context.destination);
+			// 	this._source.start(0, 0, 0);
+			// 	side = 0;
+			// } else{
+			// 	this._gain.pan.setValueAtTime(side, 0);
 
-
-
+			// 	this._source.connect(this._gain);
+			// 	this._gain.connect(this._context.destination);
+			// 	this._source.start(0, 0,0.9);
+			// }
+		
 		this._gain.pan.setValueAtTime(side, 0);
 
 		this._source.connect(this._gain);
 		this._gain.connect(this._context.destination);
-		this._source.start(0, 0,0.8);
+		this._source.start(0, 0,0.9);
 	}
 
 	defineSoundWebApi() {
+		
 		if (this.sensor[0] <= this.sensibilidade ||
 			this.sensor[1] <= this.sensibilidade ||
 			this.sensor[2] <= this.sensibilidade) {
-
+			
 			if (this.sensor[0] < this.sensor[1] && this.sensor[0] < this.sensor[2]) {
-
-				return -1
+			
+				return -1;
 
 			} else if (this.sensor[1] < this.sensor[0] && this.sensor[1] < this.sensor[2]) {
 
@@ -127,6 +153,9 @@ export class AudioProvider2 {
 
 				return 1;
 			}
+		}
+		else{
+			return 0; // retornar 2 para testar 
 		}
 	}
 
@@ -156,21 +185,22 @@ export class AudioProvider2 {
 	// }
 
 	calcularFrequencia(distancia) {
+		
 		var frequencia;
-		var frequencia_MIN = 600;
+		var frequencia_MIN = 1300;
 		var frequencia_MAX = 4000;
-		var distancia_MIN = 50;
-
+		var distancia_MIN = 30;
+	
 		if (distancia >= distancia_MIN) {
-			frequencia = distancia * 20;
+				frequencia = distancia * 18;
 		} else {
-			frequencia = frequencia_MIN;
+				frequencia = frequencia_MIN;
 		}
-
+	
 		if (frequencia > frequencia_MAX) {
-			frequencia = frequencia_MAX;
+				frequencia = frequencia_MAX;
 		}
-
+	
 		console.log("frequencia atual: " + frequencia)
 		return frequencia;
 	}
@@ -203,6 +233,29 @@ export class AudioProvider2 {
 	atualizarSensor(sensor: number[], variaveis) {
 		this.sensor = sensor;
 		this._variaveis = variaveis;
+
+		console.log('lado: ' + variaveis.side + 
+			'duracao: ' + variaveis.sound_duration +
+			'som: ' + variaveis.track +
+			'frequencia: ' + variaveis.frequencia);
+		
 		this.loadSound();
 	}
+
+	playSound(){
+
+		this.intervalo = setInterval(() => {
+
+			// Como o método de salvar a distancia do sensor saiu da classe do synesthesiavision
+			// É necessário atualizar o distanceSensor antes de executar o som.
+			this.distanceSensor = this.bluetoothProvider.getDistanceSensor();
+
+			this.atualizarSensor(this.distanceSensor, this.variaveis);
+		}, this.calcularFrequencia(this.bluetoothProvider.getDistanceMin()));
+	}
+
+	stopRunningSound(){
+		clearInterval(this.intervalo);
+	}
+	
 }

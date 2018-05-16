@@ -30,14 +30,10 @@ export class TextToSpeechProvider {
 
 	speak(message: string){
 
-		this.tts.speak({
+		return this.tts.speak({
 			text   : message,
 			locale : 'pt-BR',
 			rate   : 1
-		}).then((success) => {
-			console.log(success);
-		}, (err) => {
-			console.log(err)
 		});
 	}
 
@@ -45,7 +41,7 @@ export class TextToSpeechProvider {
 
 		this.tts.speak(this.TTSOptions).then((success) => {
 			console.log(success);
-		}, (err) => {
+		}).catch( (err) => {
 			console.log(err)
 		});
 	}

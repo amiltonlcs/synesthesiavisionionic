@@ -16,7 +16,7 @@ import { AudioProvider2 } from './audio';
 })
 export class SoundTrackerPage {
 
-  sensor : number[] = [130,90,190];
+  sensor : number[] = [0,0,0];
   
   constructor(public navCtrl: NavController, public navParams: NavParams, public audio: AudioProvider2) {
 

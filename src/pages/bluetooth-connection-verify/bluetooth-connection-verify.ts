@@ -37,24 +37,16 @@ export class BluetoothConnectionVerifyPage {
 	public isPlaying: boolean = false;
     public tracks: any = [
 		{
-		   	artist  : 'Time Synesthesia',
-			name    : 'Confirmar bluetooth',
-		   	track   : 'assets/sounds/bluetooth_confirma.ogg'
+		   	name   : 'assets/sounds/bluetooth_confirma.ogg'
 		},
 		{
-			artist  : 'Time Synesthesia',
-		   	name    : 'Erro bluetooth',
-		   	track   : 'assets/sounds/bluetooth_erro.ogg'
+            name   : 'assets/sounds/bluetooth_erro.ogg'
 		},
 		{
-			artist  : 'Time Synesthesia',
-		   	name    : 'Som synesthesia',
-		   	track   : 'assets/sounds/synesthesia_sound.ogg'
+            name   : 'assets/sounds/synesthesia_sound.ogg'
 		},
 		{
-			artist  : 'Time Synesthesia',
-		   	name    : 'Finalizar aplicativo',
-		   	track   : 'assets/sounds/finalizar.ogg'
+            name   : 'assets/sounds/finalizar.ogg'
 		}
 	];
 
@@ -318,7 +310,7 @@ export class BluetoothConnectionVerifyPage {
 	}
 
 	triggerPlayback(track : string){
-		this.audioProvider.loadSound(track);
+		this.audioProvider.loadSound(track); 
 		this.isPlaying  = true;
 	}
 

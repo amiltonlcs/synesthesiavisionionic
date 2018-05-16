@@ -17,7 +17,8 @@ import { WeatherForecastProvider } from '../weather-forecast/weather-forecast';
 export class BluetoothProvider {
 
 	// Variables
-	private isEnabled: boolean = false;
+	private isEnabled         : boolean = false;
+	private isConnected       : boolean = false; 
 	private rx_buffer         : string;
 	private numberSensor      : number   = 3;
 	private distanceSensor    : number[] = [this.numberSensor];
@@ -59,25 +60,21 @@ export class BluetoothProvider {
 		console.log('Hello BluetoothProvider Provider');
 	}
 
-	getData (): any{
-
-		return this.bluetoothSerial.subscribe('\n').subscribe();
-	}
-
 	connectToDevice(address: string){
 		return this.bluetoothSerial.connect(address);
 	}
 
-	    /**
+	/**
      * Salva o endereço do dispositivo pressionado caso haja uma conexão bem sucedida
      * @param address
-     */
+    */
     saveAddress(address: string){
         this.nativeStorage.setItem('bt_address', address).then(() => { 
             console.log('Stored item!')
-        }, error => {
-            console.error('Error storing item', error)
-        });
+        }).catch((err) => {
+			console.log('Error storing item: ', err);
+			
+		});
     }
 
     /**
@@ -97,17 +94,16 @@ export class BluetoothProvider {
      * @param address
      */
     autoConnect(address: string){
-        
-       	return this.bluetoothSerial.connect(address).subscribe((success) => {
-			this.loadSound('assets/sounds/bluetooth_confirma.ogg');
-			this.synesthesia();
-		}, (fail) => {
-			this.loadSound('assets/sounds/bluetooth_erro.ogg');
-		});
-	}
 
-	synesthesia(){
-        // this.navCtrl.push(SynesthesiavisionPage);
+		this.connectToDevice(address).subscribe((success) => {
+
+			this.loadSound('assets/sounds/bluetooth_confirma.ogg');
+			this.isConnected = true;
+		}, (fail) => {
+
+			this.loadSound('assets/sounds/bluetooth_erro.ogg');
+			this.isConnected = false;
+		});
 	}
 
 	getDistanceSensor(): number[]{
@@ -148,9 +144,6 @@ export class BluetoothProvider {
 				this.weatherForecastProvider.startChecking();
 			}
 
-			console.log('Resultado: ,' + this.rx_buffer + ',');
-			
-
 			let inx = this.rx_buffer.indexOf(this.DELIMITER);
 	
 			//Get the first character responsable for indentifier the sensor
@@ -178,6 +171,24 @@ export class BluetoothProvider {
 		}, (err) => {
 
 		});
+	}
+
+	public getDistanceMin(){
+		
+		
+		//return maior = Math.max.apply(null, this.distanceSensor );
+		if (this.distanceSensor[0] < this.distanceSensor[1] && this.distanceSensor[0] < this.distanceSensor[2]) {
+
+			return this.distanceSensor[0];
+
+		} else if (this.distanceSensor[1] < this.distanceSensor[0] && this.distanceSensor[1] < this.distanceSensor[2]) {
+
+			return this.distanceSensor[1];
+
+		} else if (this.distanceSensor[2] < this.distanceSensor[0] && this.distanceSensor[2] < this.distanceSensor[1]) {
+
+			return this.distanceSensor[2];
+		}
 	}
 
     /** 

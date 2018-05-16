@@ -31,6 +31,7 @@ import { WeatherForecastProvider } from '../providers/weather-forecast/weather-f
 import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech';
 import { PermissionProvider } from '../providers/permission/permission';
 import { AudioProvider2 } from "../pages/sound-tracker/audio";
+import { BusIntegrationProvider } from '../providers/bus-integration/bus-integration';
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
@@ -75,7 +76,8 @@ import { AudioProvider2 } from "../pages/sound-tracker/audio";
 		TextToSpeechProvider,
 		AudioProvider,
 		PermissionProvider,
-		AudioProvider2
+		AudioProvider2,
+        BusIntegrationProvider
 	]
 })
 export class AppModule {}
