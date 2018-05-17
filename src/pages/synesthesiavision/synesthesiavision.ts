@@ -11,6 +11,8 @@ import { AudioProvider } from '../../providers/audio/audio';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { AudioProvider2 } from '../sound-tracker/audio';
 import { BusIntegrationProvider } from '../../providers/bus-integration/bus-integration';
+import { HorariosPage } from '../horarios/horarios';
+import { PermissionProvider } from '../../providers/permission/permission';
 
 /**
  * Generated class for the SynesthesiavisionPage page.
@@ -78,7 +80,7 @@ export class SynesthesiavisionPage {
 				public ttsProvider: TextToSpeechProvider, public vibrator: Vibration,
 				public bluetoothProvider: BluetoothProvider, public bluetoothSerial: BluetoothSerial,
 				public audioProvider: AudioProvider, public audioProvider2: AudioProvider2,
-				public busIntegration : BusIntegrationProvider) {
+				public busIntegration : BusIntegrationProvider, public permissionsProvider: PermissionProvider) {
 
 		// Modificar futuramente para permitir a acessibilidade do usuário
 		// if(mobileAccessibility.isScreenReaderRunning()){
@@ -98,6 +100,7 @@ export class SynesthesiavisionPage {
 	}
 
 	ionViewDidLoad() {
+		this.permissionsProvider.getPermissions();
 		this.getBluetoothData();
 	}
 
@@ -307,14 +310,9 @@ export class SynesthesiavisionPage {
 
 
 
-
-
 	getParadas(){
 	
-		
-	
 		return this.busIntegration.startChecking().then((paradas) => {
-
 		});
 	}
 
@@ -395,103 +393,7 @@ export class SynesthesiavisionPage {
 	}
 
 	getParadaProxima(){
-
-		let menorLocalizacao;
-		let valores: any[];
-
-		this.ttsProvider.speak('Verificando ônibus da parada mais próxima.');
-
-		this.busIntegration.startChecking().then((etiquetasParadas) => {
-			
-			//Criado um objeto que recebe um nome e é associado ao tipo ParadasRequest (Array de String)
-			let etiquetasParadasArray: { [params: string]: string[]; } = {};
-			etiquetasParadasArray['params'] = etiquetasParadas; // Adiciona os dados necessários
-
-			return this.busIntegration.getParadasPorLabel(etiquetasParadasArray);
-		}).then((paradasEncontradas) => {
-			return this.busIntegration.calculaMenorCoordenada(paradasEncontradas);
-		}).then((menorPosicao: any) => {
-			return this.busIntegration.getEstimacao(menorPosicao.Label);
-		}).then((vehicleEstimationList: any) => {
-
-			if(vehicleEstimationList.length < 5){
-
-				for(let i = 0; i < vehicleEstimationList.length; i++){
-
-					let arrival = this.transformTime(vehicleEstimationList[i].arrivalTime);
-			
-					let frase = 'Ônibus linha' + vehicleEstimationList[i].line + ', chegando em ' + arrival + '.'
-	
-					setTimeout(() => {
-								
-						this.ttsProvider.speak(frase).then((success) => {
-		
-						});
-					}, 2200);
-				}
-			}
-
-			for(let i = 0; i < 5; i++){
-
-				let arrival = this.transformTime(vehicleEstimationList[i].arrivalTime);
-		
-				let frase = 'Ônibus linha' + vehicleEstimationList[i].line + ', chegando em ' + arrival + '.'
-
-				this.ttsProvider.speak(frase).then((success) => {
-					setTimeout(() => {
-								
-					}, 1200);
-
-				});
-			}
-		}).catch((err) => {
-			this.ttsProvider.speak('Ocorreu algum erro ao veriricar a linha.');
-		});
-
+		this.navCtrl.push(HorariosPage);
 	}
 
-	transformTime(value: string) {
-
-		let dataFiltrada = '';
-
-		let actualDate = new Date();
-		let miliseconds = value.slice(6, 19);
-
-		let result = Number(miliseconds) - actualDate.getTime();
-		let resultDate = new Date(result);
-
-		var h = resultDate.getUTCHours();
-		var m = resultDate.getUTCMinutes();
-		var s = resultDate.getUTCSeconds();
-
-		if(h !== 0){
-
-			if(h > 1){
-				dataFiltrada = h + ' horas ';
-			} else{
-				dataFiltrada = h + ' hora ';
-			}
-		}
-
-		if(m !== 0){
-			if(m > 1){
-
-				dataFiltrada = dataFiltrada + m + ' minutos ';
-			} else{
-				dataFiltrada = dataFiltrada+ m + ' minuto ';
-			}
-		}
-
-		if(s !== 0){
-			if(s > 1){
-
-				dataFiltrada = dataFiltrada + ' e ' + s + ' segundos';
-			} else{
-				dataFiltrada = dataFiltrada + ' e ' + s + ' segundo';
-			}
-		}
-
-		return dataFiltrada;
-	}
-	
 }

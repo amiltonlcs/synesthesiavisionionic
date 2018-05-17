@@ -11,9 +11,6 @@ import { TextToSpeech } from '@ionic-native/text-to-speech';
 @Injectable()
 export class TextToSpeechProvider {
 
-	private ttsLocal   : string = 'pt-BR';
-	private ttsRate    : number = 0.75;
-	private ttsText    : string;
 	private TTSOptions : any;
 
 	constructor(public http: HttpClient, public tts: TextToSpeech) {

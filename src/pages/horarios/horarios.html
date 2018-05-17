@@ -1,0 +1,35 @@
+<!--
+  Generated template for the HorariosPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+	<ion-navbar>
+		<ion-title>Horários</ion-title>
+	</ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+
+	<ion-list ng-if="listaParadas">
+		<ion-item *ngFor='let parada of listaParadas'>
+			<ion-icon name="parada" large item-start isActive="false"></ion-icon>
+			<span (click)="getHorarios(parada.Label)">
+				<p>{{parada.nombre}}</p>
+				<p>{{parada.endereco}}</p>
+			</span>
+		</ion-item>
+	</ion-list>
+
+	<ion-list ng-if="listaHorariosDaParada">
+		<ion-item *ngFor='let horario of listaHorariosDaParada'>
+			<ion-icon name="horario" large item-start isActive="false"></ion-icon>
+			<span (click)="speakData(horario.line, horario.arrivalTime)">
+				<p>{{horario.line}}</p>
+				<p>Saída: {{horario.exitTime | datePipe}}</p>
+			</span>
+		</ion-item>
+	</ion-list>
+</ion-content>

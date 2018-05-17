@@ -23,7 +23,6 @@ import { HTTP } from '@ionic-native/http';
 import { Vibration } from "@ionic-native/vibration";
 import { HttpModule } from "@angular/http";
 
-
 // Services imports
 import { AudioProvider } from '../providers/audio/audio';
 import { BluetoothProvider } from '../providers/bluetooth/bluetooth';
@@ -32,6 +31,10 @@ import { TextToSpeechProvider } from '../providers/text-to-speech/text-to-speech
 import { PermissionProvider } from '../providers/permission/permission';
 import { AudioProvider2 } from "../pages/sound-tracker/audio";
 import { BusIntegrationProvider } from '../providers/bus-integration/bus-integration';
+import { HorariosPage } from '../pages/horarios/horarios';
+
+//Pipes
+import { DatePipe } from '../pipes/date/date';
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
@@ -40,7 +43,10 @@ import { BusIntegrationProvider } from '../providers/bus-integration/bus-integra
 
 		SynesthesiavisionPage,
 		BluetoothConnectionVerifyPage,
-		SoundTrackerPage
+		SoundTrackerPage,
+		HorariosPage,
+
+		DatePipe
 	],
 	imports: [
 		BrowserModule,
@@ -54,7 +60,8 @@ import { BusIntegrationProvider } from '../providers/bus-integration/bus-integra
 
 		SynesthesiavisionPage,
 		BluetoothConnectionVerifyPage,
-		SoundTrackerPage
+		SoundTrackerPage,
+		HorariosPage
 	],
 	providers: [
 		StatusBar,

@@ -48,24 +48,8 @@ export class BusIntegrationProvider {
 		let resultado         :  LineDescriptor[];
 
 		this.http.setRequestTimeout(15);
-		this.http.get(url, {}, {responseType: 'text'}).then((success) => {
-
-			resultado = JSON.parse(success.data);
-			
-			resultado.forEach(element => {
-				console.log("(LineDescriptor[]) Linhas: " + element.nombre);
-			});
-
-			
-		}).catch((err)=> {
-
-			let alert = this.alertCtrl.create({
-				title: 'Erro',
-				message: err.error,
-				buttons: ['OK']
-			});
-	
-			alert.present();
+		return this.http.get(url, {}, {responseType: 'text'}).then((success) => {
+			return resultado = JSON.parse(success.data);
 		});
 	}
 

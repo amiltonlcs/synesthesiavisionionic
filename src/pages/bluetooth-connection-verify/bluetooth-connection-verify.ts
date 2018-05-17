@@ -54,11 +54,10 @@ export class BluetoothConnectionVerifyPage {
         private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
         public navParams: NavParams, public alertCtrl: AlertController, 
         public loadingCtrl: LoadingController, public nativeStorage: NativeStorage,
-        public permissionsProvider: PermissionProvider, public audioProvider: AudioProvider,
-        public bluetoothProvider: BluetoothProvider, public ttsProvider: TextToSpeechProvider) {
+        public audioProvider: AudioProvider, public bluetoothProvider: BluetoothProvider, 
+        public ttsProvider: TextToSpeechProvider) {
         
         this.checkEnabledBluetooth();
-        this.permissionsProvider.getPermissions();
 	}
 
   	ionViewDidLoad() {
