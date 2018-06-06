@@ -18,6 +18,7 @@ import { NativeStorage } from '@ionic-native/native-storage';
 })
 export class HorariosPage {
 
+	private savedLines            : boolean = false;
 	private gettingBusSchedule    : boolean = false;
 	private gettingBusLines       : boolean = false;
 	private gettingCloserStops    : boolean = false
@@ -34,7 +35,11 @@ export class HorariosPage {
     ionViewDidLoad() {
 		console.log('ionViewDidLoad HorariosPage');
 		
-		this.getLinhas();
+		this.checkLineNameByLabel('56').then((result) => {
+		}).catch((err) => {
+			this.getLinhas();
+		});
+
 		this.getParadas();
 	}
 
@@ -256,6 +261,16 @@ export class HorariosPage {
      */
     checkLineNameByLabel(lineLabel: string){
         return this.nativeStorage.getItem(lineLabel);
+	}
+
+	listarHorarios(){
+		this.listaHorariosDaParada.forEach(horario => {
+			this.speakData(horario.line , this.transformTime(horario.exitTime));
+		});
+	}
+
+	voltar(){
+		this.listaHorariosDaParada = undefined;
 	}
 
 }

@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { AudioProvider } from '../audio/audio';
-import { NavController } from 'ionic-angular';
-import { SynesthesiavisionPage } from '../../pages/synesthesiavision/synesthesiavision';
+// import { NavController } from 'ionic-angular';
+// import { SynesthesiavisionPage } from '../../pages/synesthesiavision/synesthesiavision';
 import { WeatherForecastProvider } from '../weather-forecast/weather-forecast';
+import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
 
 /*
   Generated class for the BluetoothProvider provider.
@@ -19,7 +20,7 @@ export class BluetoothProvider {
 	// Variables
 	private isEnabled         : boolean = false;
 	private isConnected       : boolean = false; 
-	private rx_buffer         : string;
+	// private rx_buffer         : string;
 	private numberSensor      : number   = 3;
 	private distanceSensor    : number[] = [this.numberSensor];
 
@@ -56,7 +57,7 @@ export class BluetoothProvider {
 
 	constructor(public http: HttpClient, public bluetoothSerial: BluetoothSerial,
 				public nativeStorage: NativeStorage, public audioProvider: AudioProvider,
-				public weatherForecastProvider: WeatherForecastProvider) {
+				public weatherForecastProvider: WeatherForecastProvider, public ttsProvider: TextToSpeechProvider) {
 		console.log('Hello BluetoothProvider Provider');
 	}
 
@@ -73,7 +74,6 @@ export class BluetoothProvider {
             console.log('Stored item!')
         }).catch((err) => {
 			console.log('Error storing item: ', err);
-			
 		});
     }
 
@@ -133,27 +133,76 @@ export class BluetoothProvider {
 		}
 	}
 	
-	getBluetoothData(): any{
+	getBluetoothData(){
 
-		let dados: any = { nomeSensor: Number, distance: Number};
+		// let dados: any = { nomeSensor: Number, distance: Number};
 
-		return this.bluetoothSerial.subscribe(this.DELIMITER).subscribe((data) => {
-			this.rx_buffer = data;
+		return this.bluetoothSerial.subscribe(this.DELIMITER);
 
-			if(this.rx_buffer.includes('getweather')){
-				this.weatherForecastProvider.startChecking();
+		// return this.bluetoothSerial.subscribe(this.DELIMITER).subscribe((data) => {
+		// 	this.rx_buffer = data;
+
+		// 	console.log("valor: " + this.rx_buffer);
+			
+		// 	if(this.rx_buffer.includes('getweather')){
+		// 		this.weatherForecastProvider.startChecking();
+		// 	} else if(this.rx_buffer.includes('luminosidade')){
+		// 		this.speakLuminosity(this.rx_buffer);
+		// 	} else if(this.rx_buffer.includes('onibus')){
+		// 		return 'onibus';
+		// 	}
+
+		// 	let inx = this.rx_buffer.indexOf(this.DELIMITER);
+	
+		// 	//Get the first character responsable for indentifier the sensor
+		// 	let sensor1 = this.rx_buffer.substring(0, 1);
+			
+		// 	//Get the distance after character
+		// 	let distance = "";
+			
+		// 	try{
+		// 		distance = this.rx_buffer.substring(1, inx);
+		// 	} catch(err) {
+		// 		console.log('Error: ' + err);
+		// 	}
+			
+		// 	//Get the primary character at message, which corresponds to sensor which has sent the distance
+		// 	let sensor = sensor1.charAt(0);
+	
+		// 	//If have any data, it will save.
+		// 	//Modificar 
+		// 	if(typeof sensor === "string" && typeof distance.charAt(0) === "string") {
+		// 		if (!this.isEmpty(distance) && distance.search("DISCONNECTED") == -1) {
+		// 			this.saveData(sensor, Number(distance));
+		// 		}
+		// 	}
+		// }, (err) => {
+
+		// });
+	}
+
+	processData(data) : Promise<string>{
+
+		return new Promise((resolve, reject) => {
+			
+			if(data.includes('getweather')){
+				resolve(data);
+			} else if(data.includes('luminosidade')){
+				resolve(data);
+			} else if(data.includes('onibus')){
+				resolve(data);
 			}
-
-			let inx = this.rx_buffer.indexOf(this.DELIMITER);
+	
+			let inx = data.indexOf(this.DELIMITER);
 	
 			//Get the first character responsable for indentifier the sensor
-			let sensor1 = this.rx_buffer.substring(0, 1);
+			let sensor1 = data.substring(0, 1);
 			
 			//Get the distance after character
 			let distance = "";
 			
 			try{
-				distance = this.rx_buffer.substring(1, inx);
+				distance = data.substring(1, inx);
 			} catch(err) {
 				console.log('Error: ' + err);
 			}
@@ -168,27 +217,32 @@ export class BluetoothProvider {
 					this.saveData(sensor, Number(distance));
 				}
 			}
-		}, (err) => {
 
+			resolve('true');
 		});
+		
 	}
 
 	public getDistanceMin(){
 		
-		
-		//return maior = Math.max.apply(null, this.distanceSensor );
-		if (this.distanceSensor[0] < this.distanceSensor[1] && this.distanceSensor[0] < this.distanceSensor[2]) {
+		return new Promise((resolve, reject) => {
 
-			return this.distanceSensor[0];
+			let disMin;
 
-		} else if (this.distanceSensor[1] < this.distanceSensor[0] && this.distanceSensor[1] < this.distanceSensor[2]) {
+			//return maior = Math.max.apply(null, this.distanceSensor );
+			if (this.distanceSensor[0] < this.distanceSensor[1] && this.distanceSensor[0] < this.distanceSensor[2]) {
+	
+				disMin = this.distanceSensor[0];
+			} else if (this.distanceSensor[1] < this.distanceSensor[0] && this.distanceSensor[1] < this.distanceSensor[2]) {
+	
+				disMin = this.distanceSensor[1];
+			} else if (this.distanceSensor[2] < this.distanceSensor[0] && this.distanceSensor[2] < this.distanceSensor[1]) {
+	
+				disMin = this.distanceSensor[2];
+			}
 
-			return this.distanceSensor[1];
-
-		} else if (this.distanceSensor[2] < this.distanceSensor[0] && this.distanceSensor[2] < this.distanceSensor[1]) {
-
-			return this.distanceSensor[2];
-		}
+			resolve(disMin);
+		});
 	}
 
     /** 

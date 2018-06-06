@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HTTP } from '@ionic-native/http';
 import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
-import { Geoposition, Geolocation } from '@ionic-native/geolocation';
+import { Geolocation } from '@ionic-native/geolocation';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
 import { AlertController } from 'ionic-angular';
-import { map } from 'rxjs/operator/map';
+// import { map } from 'rxjs/operator/map';
 
 /*
   Generated class for the BusIntegrationProvider provider.
@@ -17,7 +17,7 @@ export class BusIntegrationProvider {
 	
 	private latitude          : string;
 	private longitude         : string;
-	private busList 		  : any[];
+	// private busList 		  : any[];
 
 	constructor(public http: HTTP, public ttsProvider: TextToSpeechProvider, public alertCtrl: AlertController,
 		public locationAccuracy: LocationAccuracy, public geolocation: Geolocation) {
@@ -135,20 +135,15 @@ export class BusIntegrationProvider {
 
 	getParadasZona(){
 
-		let url        : string = 'http://200.238.105.143:85/public/recife/stops?lat=' + this.latitude + '&lon=' + this.longitude + '&meters=' + 200;		
+		let meters     : any = 350;
+		let url        : string = 'http://200.238.105.143:85/public/recife/stops?lat=' + this.latitude + '&lon=' + this.longitude + '&meters=' + meters;		
 		let resultado  : any;
-		let meters     : any = 200;
 
 		this.http.setRequestTimeout(15);
 		return this.http.get(url, {}, {responseType: 'text'}).then((success) => {
 
 			// Transforma os dados recebidos em string JSON, para um objeto
 			return resultado = JSON.parse(success.data);
-
-			// console.log("(Int[]) Identificadores das estações: " + resultado);
-			
-			// Fala a previsão
-			// this.getEstimacao(resultado[2]);
 			
 		}).catch((err)=> {
 

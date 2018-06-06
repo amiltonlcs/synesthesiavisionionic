@@ -57,7 +57,12 @@ export class AudioProvider2 {
 	}
 
 	loadSound() {
-
+		// let side = this.defineSoundWebApi();
+		// if(side == 1){
+		// 	this._variaveis.track = "caminhoSom";
+		// }else if(side == -1){
+		// 	this._variaveis.track = "caminhoSom";
+		// }
 		this.http.get(this._variaveis.track, { responseType: ResponseContentType.ArrayBuffer })
 			.map(res => res.arrayBuffer())
 			.subscribe((arrayBufferContent: any) => {
@@ -113,6 +118,8 @@ export class AudioProvider2 {
 		this._source.buffer = track;
 		let side = this.defineSoundWebApi();
 		console.log(side)
+			
+		
 			//TESTAR AINDA
 			// if(side = 2){
 			// 	this._gain.pan.setValueAtTime(side, 0);
@@ -135,6 +142,7 @@ export class AudioProvider2 {
 		this._source.start(0, 0,0.9);
 	}
 
+
 	defineSoundWebApi() {
 		
 		if (this.sensor[0] <= this.sensibilidade ||
@@ -142,7 +150,7 @@ export class AudioProvider2 {
 			this.sensor[2] <= this.sensibilidade) {
 			
 			if (this.sensor[0] < this.sensor[1] && this.sensor[0] < this.sensor[2]) {
-			
+				//this._variaveis.track = "x";
 				return -1;
 
 			} else if (this.sensor[1] < this.sensor[0] && this.sensor[1] < this.sensor[2]) {
@@ -150,7 +158,7 @@ export class AudioProvider2 {
 				return 0;
 
 			} else if (this.sensor[2] < this.sensor[0] && this.sensor[2] < this.sensor[1]) {
-
+				//this._variaveis.track = "y";
 				return 1;
 			}
 		}
@@ -158,31 +166,6 @@ export class AudioProvider2 {
 			return 0; // retornar 2 para testar 
 		}
 	}
-
-	// playAudio(audioNumber?, frequencia?) {
-	// 	console.log(audioNumber);
-	// 	//SIDE: direçao que o som vai tocar. -1 ( esquerda ), 0 ( centro ), 1 (direita)
-	// 	//SOUND_DURATION: duração do som em segundos
-	// 	//TRACK: caminho para o arquivo de som
-	// 	//FREQUENCIA: frequencia entre os sons ( ainda nao implementado pois nao existe um loop ainda).
-	// 	//this.frequencyModule(this._track);
-	// 	let variaveis: any = { side: Number, sound_duration: Number, track: String, frequencia: Number };
-
-	// 	variaveis.side = 1;
-	// 	variaveis.sound_duration = 0.8;
-	// 	variaveis.track = 'assets/sounds/bu.ogg';
-	// 	variaveis.frequencia = 1;
-
-		
-	// 	setTimeout(() => {
-	// 		//CRIA A FREQUENCIA QUE ATUALMENTE É USADA EM TESTES
-	// 		this.startSound(variaveis);
-	// 		// this.defineSoundWebApi();
-			
-	// 	}, 1200);
-
-	// 	return null;
-	// }
 
 	calcularFrequencia(distancia) {
 		

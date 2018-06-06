@@ -35,6 +35,7 @@ import { HorariosPage } from '../pages/horarios/horarios';
 
 //Pipes
 import { DatePipe } from '../pipes/date/date';
+import { AudioProvider3 } from '../pages/sound-tracker/audio-Promises';
 
 // As novas páginas vão no declaragions e no entryComponents
 @NgModule({
@@ -84,7 +85,8 @@ import { DatePipe } from '../pipes/date/date';
 		AudioProvider,
 		PermissionProvider,
 		AudioProvider2,
-        BusIntegrationProvider
+		BusIntegrationProvider,
+		AudioProvider3
 	]
 })
 export class AppModule {}

@@ -3,7 +3,7 @@ import { AlertController } from 'ionic-angular';
 import { TextToSpeech } from '@ionic-native/text-to-speech';
 import { HTTP } from '@ionic-native/http';
 import { TextToSpeechProvider } from '../text-to-speech/text-to-speech';
-import { Geoposition, Geolocation } from '@ionic-native/geolocation';
+import { Geolocation } from '@ionic-native/geolocation';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
 
 /*

@@ -3,9 +3,9 @@ import { IonicPage, NavController, NavParams, AlertController, LoadingController
 import { BluetoothSerial } from '@ionic-native/bluetooth-serial';
 import { SynesthesiavisionPage } from '../synesthesiavision/synesthesiavision';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { PermissionProvider } from '../../providers/permission/permission';
+// import { PermissionProvider } from '../../providers/permission/permission';
 import { AudioProvider } from '../../providers/audio/audio';
-import { SoundTrackerPage } from '../sound-tracker/sound-tracker';
+// import { SoundTrackerPage } from '../sound-tracker/sound-tracker';
 import { BluetoothProvider } from '../../providers/bluetooth/bluetooth';
 import { TextToSpeechProvider } from '../../providers/text-to-speech/text-to-speech';
 
@@ -28,27 +28,13 @@ export class BluetoothConnectionVerifyPage {
     private isEnabled: boolean = false;
 
     //Bluetooth Variables
-	unpairedDevices  : any;
-    gettingDevices   : boolean;
-    loading          : any;
+	private unpairedDevices  : any;
+    private gettingDevices   : boolean;
+    private loading          : any;
 
     //Sound Variables
-    public volume: any = 50;
+    // public volume: any = 50;
 	public isPlaying: boolean = false;
-    public tracks: any = [
-		{
-		   	name   : 'assets/sounds/bluetooth_confirma.ogg'
-		},
-		{
-            name   : 'assets/sounds/bluetooth_erro.ogg'
-		},
-		{
-            name   : 'assets/sounds/synesthesia_sound.ogg'
-		},
-		{
-            name   : 'assets/sounds/finalizar.ogg'
-		}
-	];
 
 	constructor(
         private bluetoothSerial: BluetoothSerial, public navCtrl: NavController, 
@@ -93,7 +79,6 @@ export class BluetoothConnectionVerifyPage {
             //Deixa de exibir o loading spinner
             this.loading.dismiss();
 
-            //this.synesthesia();
         }).catch((err) => {
             console.log('Deu ERRO: ' + err);
 
@@ -101,7 +86,7 @@ export class BluetoothConnectionVerifyPage {
             this.loading.dismiss();
 
             //Caso ocorra algum erro, exibe qual foi o erro
-            this.showAlert(err);
+            this.showAlert('Erro ao conectar no Bluetooth');
         });
 
         //Lista os dispositivos pareados
@@ -111,7 +96,7 @@ export class BluetoothConnectionVerifyPage {
             success.forEach(element => {
 
                 //Se já estiver pareado com o synesthesia, pega o address local e connecta automaticamente
-                if(element.name === "Synesthesia"){
+                if((element.name).includes("Synesthesia")){
                     this.checkAddress();
                 }
             });
@@ -122,7 +107,7 @@ export class BluetoothConnectionVerifyPage {
     }
 
     success = (data) => alert(data);
-    fail = (error) => alert(error);
+    fail = (error) => alert('Erro ao conectar no Bluetooth');
 
 
     /**
@@ -152,7 +137,7 @@ export class BluetoothConnectionVerifyPage {
 
                     handler: () => {
 
-                        if(device.name === 'Synesthesia'){
+                        if((device.name).includes('Synesthesia')){
 
                             this.bluetoothSerial.connect(device.address).subscribe((success)=> {
     
@@ -313,17 +298,8 @@ export class BluetoothConnectionVerifyPage {
 		this.isPlaying  = true;
 	}
 
-	changeVolume(volume : any){
-		console.log(volume.value);
-		this.audioProvider.changeVolume(volume.value);
-	}
-
 	stopPlayback(){
 		this.isPlaying  = false;
 		this.audioProvider.stopSound();
 	}
-    
-    soundTracker(){
-        this.navCtrl.push(SoundTrackerPage);
-    }
 }
